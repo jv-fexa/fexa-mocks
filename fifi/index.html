@@ -1,0 +1,2059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fexa CMMS — Create Work Order</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+</style>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+const { useState, useMemo, useRef, useEffect, useCallback } = React;
+
+/**
+ * Fexa CMMS — Michaels Create Work Order (V1 full form, empty state)
+ * Trimmed from michaels-staples-v2.jsx to only the screen in the reference image.
+ * - Sidebar 56px navy, TopBar 66px, TabBar 52px with 200×52 tabs
+ * - Fields: 58px min-height, 12px label, 14px value, 1px underline
+ */
+
+
+/* Font Awesome script build (the stylesheet is blocked by the artifact CSP).
+   autoReplaceSvg:"nest" keeps React in control of the <i> it rendered. */
+function useFontAwesome() {
+  useEffect(() => {
+    if (document.getElementById("fa-js")) return;
+    window.FontAwesomeConfig = { autoReplaceSvg: "nest", observeMutations: true };
+    const s = document.createElement("script");
+    s.id = "fa-js";
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js";
+    s.async = true;
+    document.head.appendChild(s);
+  }, []);
+}
+
+const Icon = ({ cls = "", style = {} }) => <i className={cls} style={style} />;
+
+const C = {
+  sidebarBg: "#073B56",
+  borderSoft: "#E1E9ED",
+  greenBtn: "#89C826",
+  tabBarBg: "#EFF2F2",
+  titleBandBg: "#F4F6F6",
+  fieldUnderline: "#E1E9ED",
+  fieldLabel: "#9AA8B0",
+  text: "#343434",
+  saveBtn: "#21B8BF",
+  toggleOff: "#D8DEE2",
+  toggleOn: "#90A4AE",
+  linkBlue: "#21B8BF",
+  requiredRed: "#F44336",
+  micRed: "#E53935",
+};
+
+// ─── FEXA LOGO ───────────────────────────────────────────────────────────────
+
+const FexaLogo = ({ size = 22 }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 555 555" width={size} height={size}>
+    <path d="M224,407.52c-32.39,32.39-79.2,44.61-121.68,45.98,1.37-42.55,13.59-89.36,45.98-121.68,32.39-32.39,79.2-44.61,121.68-45.98-1.37,42.55-13.59,89.35-45.98,121.68Z" fill="#27B2B5" />
+    <path d="M452.74,453.5c-42.55-1.37-89.35-13.59-121.68-45.98-32.39-32.39-44.61-79.2-45.98-121.68,42.55,1.37,89.35,13.59,121.68,45.98,32.39,32.39,44.61,79.2,45.98,121.68" fill="#27B2B5" />
+    <path d="M452.26,101.98c-1.37,42.48-13.59,89.08-45.84,121.34-32.25,32.26-78.99,44.47-121.34,45.84,1.37-42.48,13.59-89.08,45.84-121.34,32.26-32.26,78.99-44.47,121.33-45.84" fill="#9BF6F6" />
+    <path d="M102.26,101.5c42.55,1.37,89.35,13.59,121.68,45.98,32.39,32.39,44.61,79.2,45.98,121.68-42.55-1.37-89.35-13.59-121.68-45.98-32.39-32.39-44.61-79.13-45.98-121.68" fill="#27B2B5" />
+  </svg>
+);
+
+// ─── SIDEBAR ─────────────────────────────────────────────────────────────────
+
+const NAV = [
+  "fas fa-tachometer-alt", "fas fa-chart-bar", "fas fa-wrench",
+  "far fa-money-bill-alt", "far fa-money-bill-alt", "far fa-money-bill-alt",
+  "far fa-clipboard", "far fa-money-bill-alt", "far fa-id-card", "fas fa-tag",
+  "far fa-building", "far fa-money-bill-alt", "far fa-id-card", "far fa-id-card",
+  "far fa-calendar-alt", "far fa-calendar-alt", "far fa-check-square",
+];
+const ACTIVE_NAV = 2;
+
+const Sidebar = () => (
+  <aside style={{
+    width: 56, background: C.sidebarBg, flexShrink: 0, minHeight: "100vh",
+    display: "flex", flexDirection: "column", alignItems: "center",
+  }}>
+    <div style={{ width: 56, height: 52, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <FexaLogo size={28} />
+    </div>
+    {NAV.map((cls, i) => (
+      <div key={i} style={{
+        position: "relative", width: 56, height: 44,
+        display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
+      }}>
+        {i === ACTIVE_NAV && (
+          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: C.greenBtn }} />
+        )}
+        <Icon cls={cls} style={{ color: "#fff", fontSize: 18 }} />
+      </div>
+    ))}
+  </aside>
+);
+
+// ─── TOP BAR ─────────────────────────────────────────────────────────────────
+
+const RoundBtn = ({ bg, icon }) => (
+  <button style={{
+    width: 34, height: 34, borderRadius: "50%", background: bg, border: "none",
+    color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+  }}>
+    <Icon cls={icon} style={{ fontSize: 14 }} />
+  </button>
+);
+
+const TopBar = () => (
+  <header style={{
+    height: 66, background: "#fff", display: "flex", alignItems: "center",
+    padding: "8px 16px", gap: 14, flexShrink: 0, boxSizing: "border-box",
+  }}>
+    <div style={{
+      display: "flex", alignItems: "center", gap: 10, padding: "0 12px",
+      width: 436, height: 36, background: "#fff", border: `1px solid ${C.borderSoft}`,
+      borderRadius: 3, boxSizing: "border-box", boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+    }}>
+      <Icon cls="fas fa-search" style={{ color: C.fieldLabel, fontSize: 12 }} />
+      <span style={{ flex: 1, fontSize: 13, color: C.fieldLabel }}>Search...</span>
+      <Icon cls="fas fa-microphone" style={{ color: C.micRed, fontSize: 13 }} />
+    </div>
+    <div style={{ flex: 1 }} />
+    <span style={{
+      fontFamily: "'Brush Script MT', 'Segoe Script', cursive", fontSize: 34,
+      color: "#1a1a1a", lineHeight: 1, letterSpacing: -1,
+      transform: "rotate(-2deg)", display: "inline-block", userSelect: "none",
+    }}>
+      Michaels<span style={{ fontSize: 11, verticalAlign: "super" }}>®</span>
+    </span>
+    <RoundBtn bg={C.greenBtn} icon="fas fa-plus" />
+    <RoundBtn bg="#0D3A56" icon="fas fa-question" />
+    <FexaLogo size={26} />
+    <span style={{ fontSize: 14, color: C.text }}>FEXA Support</span>
+    <Icon cls="fas fa-bars" style={{ color: "#333", fontSize: 18, cursor: "pointer" }} />
+  </header>
+);
+
+// ─── TAB BAR ─────────────────────────────────────────────────────────────────
+
+const Tab = ({ label, active, onClick }) => (
+  <div onClick={onClick} style={{
+    position: "relative", width: 200, height: 52, overflow: "hidden",
+    background: active ? "#F6F6F6" : "transparent",
+    boxShadow: active ? "0 0 6px rgba(0,0,0,0.18)" : "none",
+    borderTopLeftRadius: 3, borderTopRightRadius: 3, cursor: "pointer",
+  }}>
+    {active && <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: C.greenBtn }} />}
+    <div style={{
+      position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
+      padding: "0 32px", fontWeight: 600, fontSize: 13, color: C.text, whiteSpace: "nowrap",
+    }}>
+      {label}
+    </div>
+    <Icon cls="fas fa-times" style={{ position: "absolute", top: 12, right: 12, fontSize: 11, color: C.fieldLabel }} />
+  </div>
+);
+
+/* tabs: [{ key, label }], active: key */
+const TabBar = ({ tabs, active, onSelect }) => (
+  <nav style={{
+    height: 52, background: C.tabBarBg, display: "flex", alignItems: "flex-end",
+    padding: "0 14px", gap: 4, flexShrink: 0,
+  }}>
+    {tabs.map((t) => (
+      <Tab key={t.key} label={t.label} active={t.key === active} onClick={() => onSelect && onSelect(t.key)} />
+    ))}
+  </nav>
+);
+
+// ─── FORM PRIMITIVES ─────────────────────────────────────────────────────────
+
+const Field = ({ label, required, select, value, clearable, error }) => (
+  <div style={{
+    position: "relative", paddingBottom: 4, marginTop: 4, minHeight: 58, boxSizing: "border-box",
+    borderBottom: error ? `2px solid ${C.requiredRed}` : `1px solid ${C.fieldUnderline}`,
+  }}>
+    <span style={{ fontSize: 12, color: C.fieldLabel, letterSpacing: 0.1, display: "block" }}>
+      {label}{required && "*"}
+    </span>
+    {value && (
+      <div style={{ fontSize: 14, color: C.text, marginTop: 8, paddingRight: 44, lineHeight: 1.3 }}>
+        {value}
+      </div>
+    )}
+    {clearable && value && (
+      <Icon cls="fas fa-times" style={{
+        position: "absolute", right: select ? 24 : 4, bottom: 8, fontSize: 13, color: C.fieldLabel, cursor: "pointer",
+      }} />
+    )}
+    {select && (
+      <Icon cls="fas fa-caret-down" style={{ position: "absolute", right: 0, bottom: 8, fontSize: 14, color: C.fieldLabel }} />
+    )}
+  </div>
+);
+
+const Toggle = ({ on, onChange }) => (
+  <button onClick={onChange} style={{
+    width: 30, height: 14, borderRadius: 7, background: on ? C.toggleOn : C.toggleOff,
+    border: "none", position: "relative", cursor: "pointer", padding: 0, transition: "background 0.2s",
+  }}>
+    <div style={{
+      width: 18, height: 18, borderRadius: "50%", background: "#fff", position: "absolute",
+      top: -2, left: on ? 14 : -2, transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.25)",
+    }} />
+  </button>
+);
+
+const DescriptionField = ({ value, onChange }) => {
+  const [focus, setFocus] = useState(false);
+  return (
+    <div style={{
+      marginTop: 4, paddingBottom: 4, minHeight: 230, boxSizing: "border-box",
+      borderBottom: focus ? `2px solid ${C.linkBlue}` : `1px solid ${C.fieldUnderline}`,
+      display: "flex", flexDirection: "column",
+    }}>
+      <span style={{ fontSize: 12, color: C.fieldLabel }}>Description*</span>
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setFocus(true)}
+        onBlur={() => setFocus(false)}
+        style={{
+          flex: 1, minHeight: 200, marginTop: 8, border: "none", outline: "none", resize: "none",
+          fontFamily: "inherit", fontSize: 14, lineHeight: "20px", color: C.text, background: "transparent", padding: 0,
+        }}
+      />
+    </div>
+  );
+};
+
+/* Prototype: BROWSE adds a sample photo so the "photos carry over" rule can be demoed. */
+const PhotoChip = ({ name, onRemove }) => (
+  <span style={{
+    display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 10px",
+    background: "#E1E9ED", borderRadius: 3, fontSize: 13, color: C.text,
+  }}>
+    <Icon cls="far fa-image" style={{ fontSize: 13, color: "#5A7F93" }} />
+    {name}
+    {onRemove && (
+      <span onClick={onRemove} style={{ cursor: "pointer", lineHeight: 0 }}>
+        <Icon cls="fas fa-times" style={{ fontSize: 11, color: "#757575" }} />
+      </span>
+    )}
+  </span>
+);
+
+const PhotosField = ({ photos, onChange }) => (
+  <div style={{ borderBottom: `1px solid ${C.fieldUnderline}`, paddingBottom: 6, marginTop: 26 }}>
+    <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", minHeight: 46 }}>
+      <span style={{ fontSize: 14, color: C.fieldLabel }}>Photos</span>
+      <button
+        onClick={() => onChange([...photos, `photo-${photos.length + 1}.jpg`])}
+        style={{
+          background: C.linkBlue, color: "#fff", border: "none", padding: "12px 22px",
+          fontSize: 13, fontWeight: 600, letterSpacing: 0.5, cursor: "pointer", borderRadius: 2,
+        }}
+      >
+        BROWSE...
+      </button>
+    </div>
+    {photos.length > 0 && (
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
+        {photos.map((p) => (
+          <PhotoChip key={p} name={p} onRemove={() => onChange(photos.filter((x) => x !== p))} />
+        ))}
+      </div>
+    )}
+  </div>
+);
+
+const Underlined = ({ flex, children }) => (
+  <div style={{ flex, position: "relative", paddingBottom: 6, borderBottom: `1px solid ${C.fieldUnderline}` }}>
+    {children}
+  </div>
+);
+
+const EtaRow = () => (
+  <div style={{ marginTop: 4 }}>
+    <div style={{ fontSize: 12, color: C.fieldLabel, marginBottom: 10 }}>ETA</div>
+    <div style={{ display: "flex", gap: 20, alignItems: "flex-end" }}>
+      <Underlined flex={2.2}>
+        <span style={{ fontSize: 14, color: C.fieldLabel }}>Date</span>
+        <Icon cls="far fa-calendar" style={{ position: "absolute", right: 0, bottom: 6, fontSize: 14, color: "#555" }} />
+      </Underlined>
+      <Underlined flex={1}><span style={{ fontSize: 14, color: C.fieldLabel }}>HH</span></Underlined>
+      <Underlined flex={1}><span style={{ fontSize: 14, color: C.fieldLabel }}>MM</span></Underlined>
+      <Underlined flex={1.3}>
+        <span style={{ fontSize: 14, color: C.fieldLabel }}>AM/PM</span>
+        <Icon cls="fas fa-caret-down" style={{ position: "absolute", right: 0, bottom: 6, fontSize: 14, color: C.fieldLabel }} />
+      </Underlined>
+    </div>
+  </div>
+);
+
+const TallField = ({ label, height }) => (
+  <div style={{ marginTop: 26, minHeight: height, borderBottom: `1px solid ${C.fieldUnderline}` }}>
+    <span style={{ fontSize: 14, color: C.fieldLabel }}>{label}</span>
+  </div>
+);
+
+const Gap = ({ h }) => <div style={{ height: h }} />;
+
+// ─── COMBO FIELDS (Ext JS combobox look: type-ahead, clear ×, caret) ─────────
+
+const CLIENTS = ["Michaels"];
+const FACILITIES = ["E-Corp 0001", "Pitstop 0001"];
+const CLASSES = ["Capital Expense", "Found on PM", "Planned Maintenance", "Project", "Reactive Maintenance", "Warranty"];
+const PRIORITIES = ["24 Hour", "48 Hour", "Emergency", "Planned", "Same Day", "Within 5 days"];
+const CATEGORY_TREE = [
+  { label: "Awning", children: ["Cleaning", "Removal", "Repair / Replacement", "Resecure", "Ripped"] },
+  { label: "Cleaning", children: ["Carpet", "Post-Construction", "Pressure Washing", "Window Cleaning"] },
+  { label: "Door", children: ["Broken Glass", "Closer / Hinge", "Won't Close", "Won't Lock"] },
+  { label: "Electrical", children: ["Lighting", "Outlet / Switch", "Power Outage", "Signage"] },
+  { label: "Elevator", children: ["Entrapment", "Inspection", "Not Working"] },
+  { label: "Extermination/Pest", children: ["Birds", "Insects", "Rodents"] },
+  { label: "Fire Protection", children: ["Alarm", "Extinguisher", "Sprinkler"] },
+  { label: "Flooring", children: ["Carpet", "Tile", "Vinyl"] },
+  { label: "HVAC", children: ["Leak", "Noise", "Not Cooling", "Not Heating"] },
+  { label: "Plumbing", children: ["Clog", "Leak", "No Hot Water", "Toilet"] },
+  { label: "Roof", children: ["Inspection", "Leak"] },
+];
+
+const useOutsideClose = (ref, onClose) => {
+  useEffect(() => {
+    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose(); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, [ref, onClose]);
+};
+
+/* Shared shell: label, editable input, clear ×, caret, underline, menu. */
+const ComboShell = ({ label, labelStyle, required, value, error, open, setOpen, query, setQuery, onClear, children }) => {
+  const ref = React.useRef(null);
+  const inputRef = React.useRef(null);
+  const close = React.useCallback(() => setOpen(false), [setOpen]);
+  useOutsideClose(ref, close);
+  const underline = open
+    ? `2px solid ${C.linkBlue}`
+    : error ? `2px solid ${C.requiredRed}` : `1px solid ${C.fieldUnderline}`;
+
+  return (
+    <div ref={ref} style={{ position: "relative" }}>
+      <div
+        onMouseDown={(e) => {
+          if (e.target.closest("[data-clear]")) return;
+          if (!open) { setOpen(true); setQuery(value || ""); }
+          setTimeout(() => inputRef.current && inputRef.current.focus(), 0);
+        }}
+        style={{
+          position: "relative", paddingBottom: 4, marginTop: 4, minHeight: 58, boxSizing: "border-box",
+          borderBottom: underline, cursor: "text",
+        }}
+      >
+        <span style={{ fontSize: 12, color: C.fieldLabel, letterSpacing: 0.1, display: "block", ...labelStyle }}>
+          {label}{required && "*"}
+        </span>
+        <input
+          ref={inputRef}
+          value={open ? query : (value || "")}
+          readOnly={!open}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); }}
+          style={{
+            display: "block", width: "100%", boxSizing: "border-box", marginTop: 8,
+            border: "none", outline: "none", background: "transparent", padding: "0 48px 0 0",
+            fontSize: 14, lineHeight: "18px", color: C.text, fontFamily: "inherit", cursor: "text",
+          }}
+        />
+        {value && (
+          <span
+            data-clear
+            onClick={() => { onClear(); setOpen(false); }}
+            title="Clear"
+            style={{ position: "absolute", right: 24, bottom: 7, cursor: "pointer", lineHeight: 0 }}
+          >
+            <Icon cls="fas fa-times" style={{ fontSize: 15, color: "#757575" }} />
+          </span>
+        )}
+        <span
+          onMouseDown={(e) => { e.stopPropagation(); setOpen(!open); if (!open) setQuery(value || ""); }}
+          style={{ position: "absolute", right: 0, bottom: 7, cursor: "pointer", lineHeight: 0 }}
+        >
+          <Icon cls="fas fa-caret-down" style={{ fontSize: 14, color: "#757575" }} />
+        </span>
+      </div>
+      {open && (
+        <div style={{
+          position: "absolute", top: "100%", left: 0, right: 0, zIndex: 100,
+          background: "#fff", boxShadow: "0 3px 10px rgba(0,0,0,0.25)",
+          maxHeight: 300, overflowY: "auto",
+        }}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ComboField = ({ label, labelStyle, required, value, onChange, options, error }) => {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [hover, setHover] = useState(null);
+  const q = query.trim().toLowerCase();
+  const filtering = q && query !== value;
+  const shown = filtering ? options.filter((o) => o.toLowerCase().includes(q)) : options;
+
+  return (
+    <ComboShell {...{ label, labelStyle, required, value, error, open, setOpen, query, setQuery }} onClear={() => onChange(null)}>
+      {shown.length === 0 && <div style={{ padding: "12px 16px", fontSize: 14, color: C.fieldLabel }}>No matches</div>}
+      {shown.map((o) => (
+        <div
+          key={o}
+          onMouseEnter={() => setHover(o)}
+          onMouseLeave={() => setHover(null)}
+          onClick={() => { onChange(o); setOpen(false); }}
+          style={{
+            height: 40, display: "flex", alignItems: "center", padding: "0 16px",
+            fontSize: 14, color: "#212121", cursor: "pointer",
+            background: o === value ? "#E0E0E0" : hover === o ? "#EEEEEE" : "#fff",
+          }}
+        >
+          {o}
+        </div>
+      ))}
+    </ComboShell>
+  );
+};
+
+/* Category is a two-level tree: parents expand, children are picked and the
+   value reads "Parent > Child". Typing filters across both levels. */
+const CategoryCombo = ({ value, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [hover, setHover] = useState(null);
+  const [expanded, setExpanded] = useState({});
+  const [selParent] = (value || "").split(" > ");
+
+  const openAndSeed = (v) => {
+    setOpen(v);
+    if (v && selParent) setExpanded((e) => ({ ...e, [selParent]: true }));
+  };
+
+  const q = query.trim().toLowerCase();
+  const filtering = q && query !== value;
+  const tree = filtering
+    ? CATEGORY_TREE
+        .map((p) => ({
+          ...p,
+          children: p.label.toLowerCase().includes(q) ? p.children : p.children.filter((c) => c.toLowerCase().includes(q)),
+        }))
+        .filter((p) => p.children.length)
+    : CATEGORY_TREE;
+
+  const row = { height: 26, display: "flex", alignItems: "center", fontSize: 14, color: "#212121", cursor: "pointer" };
+
+  return (
+    <ComboShell
+      label="Category" required value={value} open={open} setOpen={openAndSeed}
+      query={query} setQuery={setQuery} onClear={() => onChange(null)}
+    >
+      {tree.length === 0 && <div style={{ padding: "12px 16px", fontSize: 14, color: C.fieldLabel }}>No matches</div>}
+      {tree.map((p) => {
+        const isOpen = filtering || expanded[p.label];
+        return (
+          <div key={p.label}>
+            <div
+              onClick={() => setExpanded({ ...expanded, [p.label]: !expanded[p.label] })}
+              onMouseEnter={() => setHover(p.label)}
+              onMouseLeave={() => setHover(null)}
+              style={{ ...row, background: hover === p.label ? "#F2F5F6" : "#fff" }}
+            >
+              <span style={{ width: 48, display: "flex", justifyContent: "center", flexShrink: 0 }}>
+                <Icon cls={isOpen ? "fas fa-chevron-up" : "fas fa-chevron-down"} style={{ fontSize: 11, color: "#212121" }} />
+              </span>
+              <span style={{ paddingLeft: 20 }}>{p.label}</span>
+            </div>
+            {isOpen && p.children.map((c) => {
+              const full = `${p.label} > ${c}`;
+              return (
+                <div
+                  key={c}
+                  onClick={() => { onChange(full); setOpen(false); }}
+                  onMouseEnter={() => setHover(full)}
+                  onMouseLeave={() => setHover(null)}
+                  style={{
+                    ...row, paddingLeft: 92,
+                    background: full === value ? "#E1E9ED" : hover === full ? "#F2F5F6" : "#fff",
+                  }}
+                >
+                  {c}
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
+    </ComboShell>
+  );
+};
+
+// ─── GRIDS (Ext JS grid, matched to the live Create Work Order page) ─────────
+/* Measured from the live app: panel headers on very-light-grey with a grey
+   500-weight title; column headers 14px charcoal on very-light-grey with 1px
+   column separators and a 2px rule underneath; rows ~38px, 14px text, 1px
+   divider. Columns have fixed widths; the last column takes the rest. */
+
+const G = {
+  headerBg: "#F6F6F6",
+  divider: "#E2E2E2",
+  headerRule: "#E0E0E0",
+  text: "#212121",
+  headerText: "#343434",
+  title: "#6E6E6E",
+  muted: "#757575",
+  icon: "#9E9E9E",
+  vividBlue: "#21B8BF",
+  tangerine: "#F58D23",
+  brightGreen: "#89C826",
+  alertRed: "#F44336",
+  pending: "#F6C244",
+};
+
+/* IconTool: vivid-blue at rest, tangerine on hover, bright-green pressed. */
+const IconTool = ({ icon, title }) => {
+  const [state, setState] = useState("rest");
+  const color = state === "down" ? G.brightGreen : state === "hover" ? G.tangerine : G.vividBlue;
+  return (
+    <button
+      title={title}
+      onMouseEnter={() => setState("hover")}
+      onMouseLeave={() => setState("rest")}
+      onMouseDown={() => setState("down")}
+      onMouseUp={() => setState("hover")}
+      style={{
+        width: 32, height: 32, border: "none", background: "none", padding: 0, cursor: "pointer",
+        display: "inline-flex", alignItems: "center", justifyContent: "center", color, fontSize: 24,
+      }}
+    >
+      <Icon cls={icon} />
+    </button>
+  );
+};
+
+const GridPanel = ({ title, tools, children }) => (
+  <section style={{ background: "#fff" }}>
+    <div style={{
+      height: 44, background: G.headerBg, display: "flex", alignItems: "center",
+      padding: "0 14px 0 14px", gap: 8,
+    }}>
+      <span style={{ fontSize: 17, color: G.title, fontWeight: 500 }}>{title}</span>
+      <div style={{ flex: 1 }} />
+      {tools}
+    </div>
+    {children}
+  </section>
+);
+
+/* Pending status: square amber block that fills the cell, italic white text. */
+const StatusBlock = ({ text, color }) => (
+  <span style={{
+    display: "block", background: color, color: "#fff",
+    padding: "5px 5px", fontSize: 14, lineHeight: "16px", fontStyle: "italic",
+    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+  }}>
+    {text}
+  </span>
+);
+
+const ellipsis = { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" };
+
+const DataGrid = ({ columns, rows = [], renderAfterRow, emptyText }) => {
+  const minWidth = columns.reduce((s, c) => s + (c.width || 120), 0);
+  return (
+    <div style={{ overflowX: "auto" }}>
+      <table style={{
+        borderCollapse: "collapse", width: "100%", minWidth, tableLayout: "fixed",
+        fontSize: 14, lineHeight: "17px", color: G.text,
+      }}>
+        <colgroup>
+          {columns.map((c) => <col key={c.key} style={c.width ? { width: c.width } : {}} />)}
+        </colgroup>
+        <thead>
+          <tr>
+            {columns.map((c, i) => (
+              <th key={c.key} style={{
+                background: G.headerBg, color: G.headerText, fontWeight: 400,
+                textAlign: "left", padding: "10px 11px", height: 37, boxSizing: "border-box",
+                borderTop: `1px solid ${G.divider}`, borderBottom: `2px solid ${G.headerRule}`,
+                borderLeft: i > 0 ? `1px solid ${G.divider}` : "none",
+                ...ellipsis,
+              }}>
+                {c.label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.length === 0 && emptyText && (
+            <tr>
+              <td colSpan={columns.length} style={{
+                padding: "28px 12px", textAlign: "center", color: G.icon, fontSize: 14,
+                borderBottom: `1px solid ${G.divider}`,
+              }}>
+                {emptyText}
+              </td>
+            </tr>
+          )}
+          {rows.map((r, ri) => (
+            <React.Fragment key={ri}>
+              <GridRow row={r} columns={columns} />
+              {renderAfterRow && renderAfterRow(r, columns.length)}
+            </React.Fragment>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+const GridRow = ({ row, columns }) => {
+  const [hover, setHover] = useState(false);
+  return (
+    <tr onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
+      {columns.map((c) => (
+        <td key={c.key} style={{
+          padding: "10px 11px", height: 37, boxSizing: "border-box",
+          borderBottom: `1px solid ${G.divider}`,
+          background: row.highlight ? "#E3F5F6" : hover ? "#F5F7F7" : "#fff",
+          fontStyle: row.italic ? "italic" : "normal",
+          ...ellipsis,
+          ...(c.tdStyle || {}),
+        }}>
+          {c.render ? c.render(row) : row[c.key]}
+        </td>
+      ))}
+    </tr>
+  );
+};
+
+const InfoIcon = () => (
+  <Icon cls="fas fa-info" style={{ fontSize: 17, color: G.icon, cursor: "pointer", fontStyle: "normal" }} />
+);
+
+const WithInfo = ({ children, color }) => (
+  <span style={{ display: "flex", alignItems: "center", gap: 14 }}>
+    <span style={{ ...ellipsis, minWidth: 0, color }}>{children}</span>
+    <InfoIcon />
+  </span>
+);
+
+// Potential Duplicate Work Orders
+const DUP_COLUMNS = [
+  { key: "id", label: "ID", width: 56 },
+  { key: "facility", label: "Facility", width: 183 },
+  { key: "status", label: "Status", width: 92 },
+  { key: "category", label: "Category", width: 183 },
+  { key: "priority", label: "Priority", width: 91 },
+  { key: "age", label: "Age", width: 92 },
+  { key: "created", label: "Created Date", width: 92 },
+  { key: "requestor", label: "Requestor", width: 275 },
+  { key: "description", label: "Description" },
+];
+
+/* Open work orders already in the system. A row shows as a potential
+   duplicate when its facility and category match what's on the form. */
+const EXISTING_WOS = [
+  {
+    id: "619", facility: "E-Corp 0001", status: "Assignment Created", category: "Awning > Cleaning",
+    priority: "48 Hour", age: "0m", created: "Sat Nov 07 2026", requestor: "", description: "this is a sample",
+  },
+  {
+    id: "612", facility: "Pitstop 0001", status: "Assignment Created", category: "Door > Won't Close",
+    priority: "24 Hour", age: "2h", created: "Fri Nov 06 2026", requestor: "", description: "Back door won't latch",
+  },
+  {
+    id: "605", facility: "Pitstop 0001", status: "In Progress", category: "Door > Won't Close",
+    priority: "48 Hour", age: "1d", created: "Thu Nov 05 2026", requestor: "", description: "Front entry door sticks and won't close fully",
+  },
+  // One open plumbing work order at Pitstop, for the call avoidance flow
+  {
+    id: "615", facility: "Pitstop 0001", status: "Assignment Created", category: "Plumbing > Clog",
+    priority: "24 Hour", age: "3h", created: "Thu Nov 12 2026", requestor: "", description: "Toilet in the back restroom is backing up",
+  },
+  // Five open lighting work orders at E-Corp, to demo the "show 3, then Show all" cap
+  {
+    id: "621", facility: "E-Corp 0001", status: "Assignment Created", category: "Electrical > Lighting",
+    priority: "24 Hour", age: "1h", created: "Sat Nov 07 2026", requestor: "", description: "Two lights out above register 3",
+  },
+  {
+    id: "617", facility: "E-Corp 0001", status: "In Progress", category: "Electrical > Lighting",
+    priority: "48 Hour", age: "5h", created: "Fri Nov 06 2026", requestor: "", description: "Flickering fixture in the back stockroom",
+  },
+  {
+    id: "609", facility: "E-Corp 0001", status: "Assignment Created", category: "Electrical > Lighting",
+    priority: "Within 5 days", age: "1d", created: "Thu Nov 05 2026", requestor: "", description: "Parking lot pole light out, north corner",
+  },
+  {
+    id: "598", facility: "E-Corp 0001", status: "In Progress", category: "Electrical > Lighting",
+    priority: "48 Hour", age: "3d", created: "Tue Nov 03 2026", requestor: "", description: "Exterior sign letters not lighting at night",
+  },
+  {
+    id: "584", facility: "E-Corp 0001", status: "On Hold", category: "Electrical > Lighting",
+    priority: "Planned", age: "6d", created: "Sat Oct 31 2026", requestor: "", description: "Replace aisle fixtures with LED retrofit",
+  },
+];
+
+/* What the existing work orders carry beyond the grid columns. */
+const WO_EXTRA = {
+  "619": { cls: "Reactive Maintenance", vendor: "A&D Electric", createdBy: "Jose Quevedo", photos: [] },
+  "612": { cls: "Reactive Maintenance", vendor: "A&D Electric", createdBy: "Jose Quevedo", photos: ["back-door.jpg"] },
+  "605": { cls: "Reactive Maintenance", vendor: "A&D Electric", createdBy: "Jose Quevedo", photos: [] },
+};
+const DEFAULT_EXTRA = { cls: "Reactive Maintenance", vendor: "A&D Electric", createdBy: "Jose Quevedo", photos: [] };
+
+/* Potential recall work orders: recent work (last 60 days, any status,
+   completed included) at the same facility AND the same exact category.
+   Based on the live "Potential Recall Work Orders" grid; descriptions are
+   placeholders. #827 and #795 don't match any flow's category, on purpose. */
+const RECENT_WOS = [
+  { id: "828", facility: "Pitstop 0001", status: "FIN Open", category: "Plumbing > Leak", priority: "48 Hour", age: "13d", created: "Sat Oct 31 2026", description: "Leak under the front restroom sink repaired" },
+  { id: "827", facility: "Pitstop 0001", status: "Completed", category: "Door > Closer", priority: "48 Hour", age: "13d", created: "Fri Oct 30 2026", description: "Front door closer slams the door shut" },
+  { id: "812", facility: "Pitstop 0001", status: "QA Review", category: "Plumbing > Leak", priority: "48 Hour", age: "23d", created: "Tue Oct 20 2026", description: "Supply line to the mop sink replaced" },
+  { id: "796", facility: "Pitstop 0001", status: "Completed", category: "Plumbing > Clog", priority: "48 Hour", age: "34d", created: "Sat Oct 10 2026", description: "Main line snaked after a restroom backup" },
+  { id: "795", facility: "Pitstop 0001", status: "Completed", category: "HVAC > No A/C", priority: "48 Hour", age: "34d", created: "Sat Oct 10 2026", description: "Back office unit blowing warm air" },
+  { id: "773", facility: "Pitstop 0001", status: "Completed", category: "Plumbing > Clog", priority: "24 Hour", age: "55d", created: "Fri Sep 18 2026", description: "Breakroom sink drain cleared" },
+  { id: "601", facility: "E-Corp 0001", status: "Completed", category: "Awning > Cleaning", priority: "48 Hour", age: "8d", created: "Thu Nov 05 2026", description: "Awning over the main entrance pressure washed" },
+  { id: "590", facility: "E-Corp 0001", status: "Completed", category: "Electrical > Lighting", priority: "24 Hour", age: "20d", created: "Sat Oct 24 2026", description: "Ballast replaced in the aisle 4 fixture" },
+  { id: "577", facility: "E-Corp 0001", status: "Completed", category: "Electrical > Lighting", priority: "48 Hour", age: "41d", created: "Thu Oct 03 2026", description: "Front entrance lights relamped" },
+];
+
+const findRecalls = (f) =>
+  f.facility && f.category
+    ? RECENT_WOS.filter((w) => w.facility === f.facility && w.category === f.category)
+    : [];
+
+const findDuplicates = (f) =>
+  f.facility && f.category
+    ? EXISTING_WOS.filter((w) => w.facility === f.facility && w.category === f.category)
+    : [];
+
+// ─── DUPLICATE HANDLING ──────────────────────────────────────────────────────
+
+const ActionButton = ({ children, onClick, disabled, title, color, hoverColor }) => {
+  const [hover, setHover] = useState(false);
+  return (
+    <button
+      onClick={disabled ? undefined : onClick}
+      title={title}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        background: hover && !disabled ? (hoverColor || "#2381BF") : (color || G.vividBlue), color: "#fff", border: "none",
+        padding: "8px 16px", borderRadius: 2, fontSize: 14, lineHeight: "16px", fontWeight: 600,
+        textTransform: "uppercase", cursor: disabled ? "default" : "pointer", opacity: disabled ? 0.6 : 1,
+        fontFamily: "inherit", whiteSpace: "nowrap",
+      }}
+    >
+      {children}
+    </button>
+  );
+};
+
+const FlatButton = ({ children, onClick }) => {
+  const [hover, setHover] = useState(false);
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        background: hover ? "rgba(0,0,0,0.06)" : "transparent", color: "#343434", border: "none",
+        padding: "8px 16px", borderRadius: 2, fontSize: 14, lineHeight: "16px", fontWeight: 600,
+        textTransform: "uppercase", cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
+      }}
+    >
+      {children}
+    </button>
+  );
+};
+
+/* Warning colours (Fexa Zamo). warningTint is a PROPOSED token, made the
+   way error-tint and success-tint are: lighten(fugly-yellow #FF9800, 45%). */
+const W = {
+  amber: "#FF9800",      // fugly-yellow: Zamo's warning amber
+  warningTint: "#FFF5E5", // proposed warning-tint
+  charcoal: "#343434",   // charcoal: base foreground, used for the radio
+  radioOff: "#757575",
+  errorTint: "#FDE0DE",  // error-tint
+};
+
+/* Custom radio: a visually hidden native input (keeps keyboard + screen
+   reader behaviour) drawn as a charcoal ring. Focus ring is charcoal, 2px
+   with a 2px gap, replacing the browser's blue outline. */
+const RADIO_CSS = `
+.fz-radio-input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; }
+.fz-radio-input:focus-visible + .fz-radio { box-shadow: 0 0 0 2px #fff, 0 0 0 4px ${W.charcoal}; }
+`;
+
+const Radio = ({ checked }) => (
+  <span className="fz-radio" style={{
+    width: 18, height: 18, borderRadius: "50%", boxSizing: "border-box", flexShrink: 0, marginTop: 0,
+    border: `2px solid ${checked ? W.charcoal : W.radioOff}`, background: "#fff",
+    display: "inline-flex", alignItems: "center", justifyContent: "center",
+  }}>
+    {checked && <span style={{ width: 8, height: 8, borderRadius: "50%", background: W.charcoal }} />}
+  </span>
+);
+
+/* One radio row: a matching work order, or the "new issue" option. */
+const ChoiceRow = ({ checked, onChoose, children }) => (
+  <label style={{
+    position: "relative", display: "flex", alignItems: "flex-start", gap: 10, padding: "8px 10px", cursor: "pointer",
+    background: checked ? "#fff" : "transparent",
+    border: `1px solid ${checked ? W.charcoal : "transparent"}`, borderRadius: 2,
+  }}>
+    <input
+      className="fz-radio-input" type="radio" name="duplicate-choice" checked={checked} onChange={onChoose}
+    />
+    <Radio checked={checked} />
+    <span style={{ fontSize: 13, lineHeight: "18px", color: G.text, minWidth: 0 }}>{children}</span>
+  </label>
+);
+
+/* Matches arrive newest first; only the first 3 show until "Show all" is
+   clicked. A chosen match below the fold stays visible after collapsing. */
+const MATCH_LIMIT = 3;
+const MatchList = ({ matches, choice, onChoose, onOpen }) => {
+  const [showAll, setShowAll] = useState(false);
+  const extra = matches.length - MATCH_LIMIT;
+  let shown = showAll || extra <= 0 ? matches : matches.slice(0, MATCH_LIMIT);
+  if (!shown.some((m) => m.id === choice)) {
+    const p = matches.find((m) => m.id === choice);
+    if (p) shown = [...shown, p];
+  }
+  return (
+    <>
+      {shown.map((m) => (
+        <ChoiceRow key={m.id} checked={choice === m.id} onChoose={() => onChoose(m.id)}>
+          <a
+            href="#"
+            title={`Open Work Order #${m.id}`}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onOpen(m.id); }}
+            style={{ fontWeight: 600, color: G.vividBlue, textDecoration: "underline" }}
+          >
+            WO #{m.id}
+          </a>{" "}
+          · {m.status} · {m.priority} · created {m.age} ago
+          <span style={{ display: "block", color: G.muted }}>{m.description}</span>
+        </ChoiceRow>
+      ))}
+      {extra > 0 && (
+        <a
+          href="#"
+          onClick={(e) => { e.preventDefault(); setShowAll(!showAll); }}
+          style={{ color: G.vividBlue, textDecoration: "none", fontSize: 13, padding: "2px 10px 4px", alignSelf: "flex-start" }}
+        >
+          {showAll ? "Show fewer" : `Show all ${matches.length}`}
+        </a>
+      )}
+    </>
+  );
+};
+
+const openSummary = (form, matches) =>
+  matches.length === 1
+    ? `WO #${matches[0].id} is already open at ${form.facility} for ${form.category}.`
+    : `${matches.length} work orders are already open at ${form.facility} for ${form.category}.`;
+
+/* Recent work at the facility for the same category (potential recalls), as radio options in the
+   same group as the duplicates. Picking one means "this problem came back":
+   no new work order is created and that work order's status becomes Recall.
+   Newest first; 3 shown until "Show all". A chosen one below the fold stays
+   visible after collapsing. */
+const RecallList = ({ recalls, choice, onChoose, onOpen }) => {
+  const [showAll, setShowAll] = useState(false);
+  const extra = recalls.length - MATCH_LIMIT;
+  let shown = showAll || extra <= 0 ? recalls : recalls.slice(0, MATCH_LIMIT);
+  if (!shown.some((m) => m.id === choice)) {
+    const p = recalls.find((m) => m.id === choice);
+    if (p) shown = [...shown, p];
+  }
+  return (
+    <>
+      {shown.map((m) => (
+        <ChoiceRow key={m.id} checked={choice === m.id} onChoose={() => onChoose(m.id)}>
+          <a
+            href="#"
+            title={`Open Work Order #${m.id}`}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onOpen(m.id); }}
+            style={{ fontWeight: 600, color: G.vividBlue, textDecoration: "underline" }}
+          >
+            WO #{m.id}
+          </a>{" "}
+          · {m.status} · {m.priority} · created {m.created.slice(4, 10)} ({m.age} ago)
+          <span style={{ display: "block", color: G.muted }}>{m.description}</span>
+        </ChoiceRow>
+      ))}
+      {extra > 0 && (
+        <a
+          href="#"
+          onClick={(e) => { e.preventDefault(); setShowAll(!showAll); }}
+          style={{ color: G.vividBlue, textDecoration: "none", fontSize: 13, padding: "2px 10px 4px", alignSelf: "flex-start" }}
+        >
+          {showAll ? "Show fewer" : `Show all ${recalls.length}`}
+        </a>
+      )}
+    </>
+  );
+};
+
+const SectionTitle = ({ title, sub }) => (
+  <div style={{ padding: "0 0 2px" }}>
+    <div style={{ fontSize: 14, fontWeight: 600, color: G.text }}>{title}</div>
+    {sub && <div style={{ fontSize: 13, lineHeight: "18px", color: G.text, marginTop: 3 }}>{sub}</div>}
+  </div>
+);
+
+/* Duplicate and recall check under Category. One radio group:
+   - a possible duplicate  → add your details to it
+   - a recent work order    → mark it as a recall (status becomes Recall)
+   - "No, this is a new issue" → create as usual
+   The answer can be cleared. Saving without an answer turns the box red.
+   Warning variant of the DS Callout: 2px fugly-yellow border on the
+   proposed warning-tint; the error state is the DS error Callout. */
+const DuplicateCallout = React.forwardRef(({ form, matches, recalls = [], choice, onChoose, onOpen, error }, ref) => {
+  const one = matches.length === 1;
+  const hasDup = matches.length > 0;
+  const hasRecall = recalls.length > 0;
+  const border = error ? G.alertRed : W.amber;
+  const kind = !choice || choice === "new" ? choice : (matches.some((m) => m.id === choice) ? "add" : "recall");
+  const divider = <div style={{ height: 1, background: "rgba(0,0,0,0.1)", margin: "10px 0" }} />;
+
+  return (
+    <div ref={ref} style={{
+      marginTop: 12, padding: 12, background: error ? W.errorTint : W.warningTint,
+      border: `2px solid ${border}`, scrollMarginTop: 16,
+    }}>
+      <style>{RADIO_CSS}</style>
+      <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+        <Icon cls="fas fa-exclamation-triangle" style={{ fontSize: 15, color: border, marginTop: 1 }} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {hasDup && (
+            <>
+              <SectionTitle
+                title={`Possible duplicate${one ? "" : "s"}`}
+                sub={<>{openSummary(form, matches)} {one ? "Is your request the same issue?" : "Is your request the same issue as one of these?"}</>}
+              />
+              <div style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 8 }}>
+                <MatchList matches={matches} choice={choice} onChoose={onChoose} onOpen={onOpen} />
+              </div>
+            </>
+          )}
+
+          {hasDup && hasRecall && divider}
+
+          {hasRecall && (
+            <>
+              <SectionTitle
+                title="Possible recalls"
+                sub={`Recent work at ${form.facility} for ${form.category} in the last 60 days. Is this a problem coming back after one of these?`}
+              />
+              <div style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 8 }}>
+                <RecallList recalls={recalls} choice={choice} onChoose={onChoose} onOpen={onOpen} />
+              </div>
+            </>
+          )}
+
+          {divider}
+          <ChoiceRow checked={choice === "new"} onChoose={() => onChoose("new")}>
+            <strong style={{ fontWeight: 600 }}>No, this is a new issue</strong>
+            <span style={{ display: "block", color: G.muted }}>Create a new work order as usual.</span>
+          </ChoiceRow>
+
+          {error && !choice && (
+            <div style={{ fontSize: 12, color: G.alertRed, marginTop: 6 }}>
+              Choose a work order, or say this is a new issue.
+            </div>
+          )}
+          {!error && !choice && (
+            <div style={{ fontSize: 12, lineHeight: "17px", color: G.muted, marginTop: 6 }}>
+              {hasDup && "Same issue: your description and photos are added to that work order. "}
+              {hasRecall && "Recall: that work order's status changes to Recall. "}
+              No new work order is created either way.
+            </div>
+          )}
+          {kind === "add" && (
+            <div style={{ fontSize: 13, lineHeight: "18px", color: G.text, marginTop: 8 }}>
+              <strong style={{ fontWeight: 600 }}>No new work order will be created.</strong>{" "}
+              When you save, your description and photos are added to WO #{choice}. Other fields are locked.
+            </div>
+          )}
+          {kind === "recall" && (
+            <div style={{ fontSize: 13, lineHeight: "18px", color: G.text, marginTop: 8 }}>
+              <strong style={{ fontWeight: 600 }}>No new work order will be created.</strong>{" "}
+              When you save, WO #{choice}'s status changes to Recall and your description and photos are added to it.
+              Other fields are locked.
+            </div>
+          )}
+          {kind === "new" && (
+            <div style={{ fontSize: 13, lineHeight: "18px", color: G.text, marginTop: 8 }}>
+              A new work order will be created when you save.
+            </div>
+          )}
+          {choice && (
+            <a
+              href="#"
+              onClick={(e) => { e.preventDefault(); onChoose(null); }}
+              style={{ display: "inline-block", marginTop: 6, fontSize: 13, color: G.vividBlue, textDecoration: "none" }}
+            >
+              Clear selection
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+});
+
+
+/* Fields that don't apply when adding to an existing work order. */
+const Locked = ({ on, children }) => (
+  <div aria-disabled={on || undefined} style={{
+    opacity: on ? 0.38 : 1, pointerEvents: on ? "none" : "auto", transition: "opacity 0.15s",
+  }}>
+    {children}
+  </div>
+);
+
+/* Last check before adding: what will and won't change on the existing work order. */
+const ConfirmAddDialog = ({ wo, form, saving, onBack, onConfirm }) => {
+  const vendor = (WO_EXTRA[wo.id] || DEFAULT_EXTRA).vendor;
+  const n = form.photos.length;
+  const Row = ({ icon, children }) => (
+    <div style={{ display: "flex", gap: 12, alignItems: "flex-start", padding: "7px 0" }}>
+      <Icon cls={icon} style={{ fontSize: 14, color: G.vividBlue, width: 16, marginTop: 2, textAlign: "center" }} />
+      <div style={{ flex: 1, minWidth: 0, color: G.text, fontSize: 14, lineHeight: "20px" }}>{children}</div>
+    </div>
+  );
+  return (
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 400,
+      display: "flex", alignItems: "center", justifyContent: "center",
+    }}>
+      <div style={{
+        width: 540, maxWidth: "92vw", maxHeight: "88vh", overflowY: "auto", background: "#fff",
+        boxShadow: "0 11px 15px -7px rgba(0,0,0,.2), 0 24px 38px 3px rgba(0,0,0,.14), 0 9px 46px 8px rgba(0,0,0,.12)",
+      }}>
+        <div style={{ padding: "16px 16px 0", fontSize: 18, lineHeight: "24px", fontWeight: 600, color: "#111" }}>
+          Add to Work Order #{wo.id}?
+        </div>
+        <div style={{ padding: "12px 16px 8px" }}>
+          <div style={{ fontSize: 14, lineHeight: "20px", color: "rgba(17,17,17,0.54)", marginBottom: 6 }}>
+            No new work order will be created. Here's what happens to WO #{wo.id}:
+          </div>
+          <Row icon="fas fa-align-left">
+            Your description is added below the existing one:
+            <div style={{
+              marginTop: 6, padding: "8px 10px", background: "#F6F6F6", fontSize: 13, color: G.text,
+              whiteSpace: "pre-wrap", maxHeight: 80, overflow: "hidden",
+            }}>
+              {form.description.trim()}
+            </div>
+          </Row>
+          <Row icon="far fa-image">
+            {n ? `${n} photo${n > 1 ? "s" : ""} attached.` : "No photos to attach."}
+          </Row>
+          <Row icon="fas fa-lock">Priority stays {wo.priority}. Other fields don't change.</Row>
+          <Row icon="fas fa-bell">{vendor} is notified that the description changed.</Row>
+        </div>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 2, padding: "0 8px 8px" }}>
+          <FlatButton onClick={onBack}>Back</FlatButton>
+          <ActionButton onClick={onConfirm} disabled={saving}>
+            {saving ? "Adding…" : `Add to WO #${wo.id}`}
+          </ActionButton>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+const Toast = ({ text, onDone }) => {
+  useEffect(() => {
+    const t = setTimeout(onDone, 5000);
+    return () => clearTimeout(t);
+  }, [text, onDone]);
+  return (
+    <div style={{
+      position: "fixed", left: "50%", bottom: 24, transform: "translateX(-50%)", zIndex: 500,
+      background: "#343434", color: "#fff", padding: "10px 16px", fontSize: 14, lineHeight: "18px",
+      boxShadow: "0 3px 5px -1px rgba(0,0,0,.2), 0 6px 10px 0 rgba(0,0,0,.14)", maxWidth: 560,
+    }}>
+      {text}
+    </div>
+  );
+};
+
+// ─── WORK ORDER OVERVIEW (where added details land) ──────────────────────────
+/* Matches the WO Overview page in michaels-staples-v2.jsx: action row,
+   left NavigationContainer, 8 stat tiles, Work Order Details, Service
+   Assignments, Visits. The added description and photos show inside Work
+   Order Details, the same place they live on any work order. */
+
+const OV = {
+  panelHeaderBg: "#F8F8F8",
+  labelGrey: "rgba(0,0,0,0.54)",
+  panelShadow: "2px 2px 5px 0 rgba(0,0,0,0.12), 2px 2px 5px 0 rgba(0,0,0,0.08)",
+};
+
+const OV_NAV = [
+  "Overview", "Assets", "Store Feedback", "Proposals & Invoices", "Notes",
+  "Survey Responses", "Weather", "Device Logs", "Files", "Activity Stream",
+  "Communication History", "Nearby Work Orders", "Location Work Orders", "Integration Information",
+];
+
+const STORE_INFO = {
+  "E-Corp 0001": { phone: "12145550142", lines: ["1200 Commerce St", "Dallas, TX 75202", "US", "Central Time (US & Canada)"] },
+  "Pitstop 0001": { phone: "14805550187", lines: ["455 W University Dr", "Tempe, AZ 85281", "US", "Arizona"] },
+};
+
+// Status colours follow the DS StatusBox examples.
+const SA_STATUS_COLOR = { Recall: "#F58D23", "Assignment Created": "#673AB7", "In Progress": "#4CAF50", "On Hold": "#5A7F93" };
+
+const AGE_WORDS = { m: "minute", h: "hour", d: "day" };
+const ageLabel = (a) => {
+  const n = parseInt(a, 10);
+  const u = AGE_WORDS[a.replace(/[0-9]/g, "")] || "minute";
+  return `${n} ${u}${n === 1 ? "" : "s"}`;
+};
+
+const OvField = ({ label, value, link }) => (
+  <div style={{ marginBottom: 22 }}>
+    <div style={{ fontSize: 12, color: OV.labelGrey, marginBottom: 6 }}>{label}</div>
+    <div style={{
+      fontSize: 14, color: value ? (link ? G.vividBlue : C.text) : "rgba(0,0,0,0.35)",
+      borderBottom: `1px solid ${C.borderSoft}`, paddingBottom: 7,
+      textDecoration: link ? "underline" : "none", cursor: link ? "pointer" : "default",
+      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+    }}>
+      {value || " "}
+    </div>
+  </div>
+);
+
+const OvPanelHeader = ({ title, count, icons }) => (
+  <div style={{
+    height: 48, background: OV.panelHeaderBg, display: "flex", alignItems: "center", gap: 12, padding: "0 18px",
+  }}>
+    <span style={{ fontSize: 18, color: OV.labelGrey }}>{title}</span>
+    {count != null && (
+      <span style={{
+        background: G.tangerine, color: "#fff", borderRadius: "50%", width: 22, height: 22,
+        fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center",
+      }}>{count}</span>
+    )}
+    <div style={{ flex: 1 }} />
+    <div style={{ display: "flex", gap: 14, color: G.vividBlue, alignItems: "center" }}>
+      {icons.map((ic) => (
+        <Icon key={ic} cls={ic} style={{ fontSize: ic.includes("chevron") ? 13 : 16, cursor: "pointer" }} />
+      ))}
+    </div>
+  </div>
+);
+
+const RoundedStatus = ({ text, color }) => (
+  <span style={{
+    display: "inline-block", maxWidth: "100%", boxSizing: "border-box", padding: "3px 6px", borderRadius: 5,
+    background: color, color: "#fff", fontSize: 13, lineHeight: "16px",
+    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+  }}>{text}</span>
+);
+
+const WorkOrderOverviewPage = ({ wo }) => {
+  const store = STORE_INFO[wo.facility] || { phone: "", lines: [] };
+  const stats = [
+    { label: "Work Order Age", value: ageLabel(wo.age), bg: "#89C826", icon: "far fa-calendar-alt" },
+    { label: "Overall Priority", value: wo.priority, bg: "#F58D23", icon: "fas fa-thermometer-half" },
+    { label: "Hours On Site", value: "0", bg: "#34515E", icon: "far fa-clock" },
+    { label: "Hours Billed", value: "0", bg: "#BC10E0", icon: "far fa-clock" },
+    { label: "Invoice Amount", value: "$0.00", bg: "#21B8BF", icon: "far fa-money-bill-alt" },
+    { label: "Budget NTE", value: "$0.00", bg: "#673AB7", icon: "fas fa-bullseye" },
+    { label: "Summary NTE", value: "$525.00", bg: "#4CAF50", icon: "fas fa-bullseye" },
+    { label: "Completed Visits", value: "0/0", bg: "#FF9800", icon: "far fa-id-card" },
+  ];
+
+  // The work order's existing assignment (no new one was dispatched).
+  const saColumns = SA_COLUMNS.map((c) =>
+    c.key === "status"
+      ? { ...c, tdStyle: undefined, render: (r) => <RoundedStatus text={r.status} color={SA_STATUS_COLOR[r.status] || "#5A7F93"} /> }
+      : c);
+  const saRow = {
+    id: `41${wo.id}2`, provider: wo.vendor, phone: "18005550199", status: wo.status,
+    facility: wo.facility, category: gridCategory(wo.category), priority: wo.priority, cls: wo.cls,
+    nteClient: "", nte: "$525.00", bizReq: "No",
+    response: "11/12/2026, 5:00 PM", arrival: "11/13/2026, 5:00 PM", completion: "11/14/2026, 5:00 PM",
+  };
+
+  return (
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      {/* Action row: WORKFLOW left, OPEN right */}
+      <div style={{ padding: "12px 20px 0", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+        <button style={{
+          background: G.vividBlue, color: "#fff", border: "none", borderRadius: 4, padding: "9px 16px",
+          fontSize: 13, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, fontFamily: "inherit",
+        }}>
+          WORKFLOW <Icon cls="fas fa-caret-down" style={{ fontSize: 12 }} />
+        </button>
+        <span style={{
+          background: wo.status === "Completed" ? "#5A7F93" : wo.status === "Recall" ? G.tangerine : G.brightGreen,
+          color: "#fff", fontSize: 12, fontWeight: 700, padding: "8px 18px", borderRadius: 4,
+        }}>
+          {wo.status === "Completed" ? "COMPLETED" : wo.status === "Recall" ? "RECALL" : "OPEN"}
+        </span>
+      </div>
+
+      <div style={{ flex: 1, display: "flex", overflow: "hidden", padding: "12px 20px 0 20px", gap: 16 }}>
+        {/* Left NavigationContainer */}
+        <div style={{ width: 260, flexShrink: 0, overflowY: "auto" }}>
+          <div style={{ background: OV.panelHeaderBg, overflow: "hidden", boxShadow: OV.panelShadow }}>
+            {OV_NAV.map((item, i) => (
+              <div key={item} style={{
+                padding: "13px 18px", fontSize: 14, cursor: "pointer",
+                background: i === 0 ? G.brightGreen : "transparent",
+                color: i === 0 ? "#fff" : C.text, fontWeight: i === 0 ? 700 : 400,
+              }}>{item}</div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right content */}
+        <div style={{ flex: 1, minWidth: 0, overflowY: "auto", paddingBottom: 60 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginBottom: 14 }}>
+            {stats.map((s) => (
+              <div key={s.label} style={{
+                background: s.bg, color: "#fff", padding: "16px 18px", minHeight: 74, boxSizing: "border-box",
+                display: "flex", alignItems: "center", gap: 12,
+              }}>
+                <Icon cls={s.icon} style={{ fontSize: 30, opacity: 0.95, flexShrink: 0 }} />
+                <div style={{ flex: 1, textAlign: "right", minWidth: 0 }}>
+                  <div style={{ fontSize: 22, fontWeight: 700, lineHeight: 1.05, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.value}</div>
+                  <div style={{ fontSize: 12.5, opacity: 0.95, marginTop: 2 }}>{s.label}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Work Order Details */}
+          <div style={{ marginBottom: 18 }}>
+            <OvPanelHeader
+              title="Work Order Details"
+              icons={["far fa-edit", "far fa-paper-plane", "far fa-handshake", "fas fa-arrows-alt-h", "far fa-copy", "far fa-save", "fas fa-chevron-up"]}
+            />
+            <div style={{ padding: "18px 2px 0", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 60px", alignItems: "start" }}>
+              <div>
+                <OvField label="Work Order ID" value={wo.id} />
+                <div style={{
+                  marginBottom: 22, border: `1px solid ${C.borderSoft}`, borderRadius: 2, padding: "12px 14px",
+                  position: "relative", fontSize: 13.5, color: C.text, lineHeight: 1.65,
+                }}>
+                  <div style={{ fontWeight: 700, marginBottom: 2 }}>
+                    Store Details <Icon cls="fas fa-info-circle" style={{ fontSize: 11, color: "#555" }} />
+                  </div>
+                  <span style={{ position: "absolute", top: 12, right: 14, fontSize: 12.5 }}>USD</span>
+                  <a href="#" onClick={(e) => e.preventDefault()} style={{ color: G.vividBlue, textDecoration: "underline" }}>{wo.facility}</a> (Michaels)
+                  {store.lines.map((l) => <div key={l}>{l}</div>)}
+                </div>
+                <OvField label="Store Phone Number" value={store.phone} />
+                <OvField label="Category" value={wo.category} />
+
+                {/* Description: original first, then each addition under a separator */}
+                <div style={{ marginBottom: 26 }}>
+                  <div style={{ fontSize: 12, color: OV.labelGrey, marginBottom: 6 }}>Description</div>
+                  <div style={{
+                    fontSize: 14, lineHeight: "20px", color: C.text, borderBottom: `1px solid ${C.borderSoft}`,
+                    paddingBottom: 10, minHeight: 90, whiteSpace: "pre-wrap",
+                  }}>
+                    {wo.description}
+                    {wo.additions.map((a, i) => (
+                      <React.Fragment key={i}>
+                        <div style={{ margin: "12px 0 6px", fontSize: 12, color: G.muted, display: "flex", alignItems: "center", gap: 8 }}>
+                          <span style={{ flex: "0 0 16px", height: 1, background: C.borderSoft }} />
+                          Added by {a.by}, {a.at}
+                          <span style={{ flex: 1, height: 1, background: C.borderSoft }} />
+                        </div>
+                        {a.text}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ marginBottom: 26 }}>
+                  <div style={{ fontSize: 12, color: OV.labelGrey, marginBottom: 8 }}>Photos</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, borderBottom: `1px solid ${C.borderSoft}`, paddingBottom: 8 }}>
+                    {wo.photos.length === 0
+                      ? <span style={{ fontSize: 13, color: C.fieldLabel }}>None attached</span>
+                      : wo.photos.map((p) => <PhotoChip key={p} name={p} />)}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <OvField label="NTE" value="525.00" />
+                <OvField label="PO Number" value="" />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, marginBottom: 22 }}>
+                  <div>
+                    <div style={{ fontSize: 12, color: OV.labelGrey, marginBottom: 6 }}>Created Date</div>
+                    <div style={{ fontSize: 14, color: C.text }}>{wo.created}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 12, color: OV.labelGrey, marginBottom: 6 }}>Created By</div>
+                    <div style={{ fontSize: 14, color: C.text }}>{wo.createdBy}</div>
+                  </div>
+                </div>
+                <OvField label="Class" value={wo.cls} />
+                <OvField label="Priority" value={wo.priority} />
+                <div style={{ marginBottom: 22 }}>
+                  <div style={{ fontSize: 12, color: OV.labelGrey, marginBottom: 6 }}>Date Completed</div>
+                  <div style={{ display: "flex", gap: 18, alignItems: "flex-end", color: "rgba(0,0,0,0.35)", fontSize: 14 }}>
+                    <div style={{ flex: 2.2, position: "relative", borderBottom: `1px solid ${C.borderSoft}`, paddingBottom: 7 }}>
+                      Date <Icon cls="far fa-calendar" style={{ position: "absolute", right: 0, bottom: 8, fontSize: 14, color: "#555" }} />
+                    </div>
+                    <div style={{ flex: 1, borderBottom: `1px solid ${C.borderSoft}`, paddingBottom: 7 }}>HH</div>
+                    <div style={{ flex: 1, borderBottom: `1px solid ${C.borderSoft}`, paddingBottom: 7 }}>MM</div>
+                    <div style={{ flex: 1.2, position: "relative", borderBottom: `1px solid ${C.borderSoft}`, paddingBottom: 7 }}>
+                      AM/PM <Icon cls="fas fa-caret-down" style={{ position: "absolute", right: 0, bottom: 8, fontSize: 14, color: C.fieldLabel }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Service Assignments: the existing one, unchanged */}
+          <div style={{ margin: "22px 0 0" }}>
+            <OvPanelHeader title="Service Assignments" count={1} icons={["fas fa-location-arrow", "fas fa-plus", "fas fa-chevron-up"]} />
+            <DataGrid columns={saColumns} rows={[saRow]} />
+          </div>
+
+          {/* Visits */}
+          <div style={{ margin: "26px 0 0" }}>
+            <OvPanelHeader title="Visits" count={0} icons={["fas fa-plus", "fas fa-chevron-up"]} />
+            <DataGrid columns={SV_COLUMNS} rows={[]} emptyText="No Visits To Display" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const gridCategory = (c) => (c ? c.replace(" > ", " | ") : "");
+
+// Service Assignments — italic until the work order is saved
+const SA_COLUMNS = [
+  { key: "id", label: "ID", width: 63 },
+  { key: "provider", label: "Provider", width: 98, render: (r) => <WithInfo>{r.provider}</WithInfo> },
+  { key: "phone", label: "Phone", width: 98 },
+  { key: "status", label: "Status", width: 98, tdStyle: { padding: "8px 18px 8px 0" },
+    render: (r) => <StatusBlock text={r.status} color={G.pending} /> },
+  { key: "facility", label: "Facility", width: 98 },
+  { key: "category", label: "Category", width: 98 },
+  { key: "priority", label: "Priority", width: 98 },
+  { key: "cls", label: "Class", width: 98 },
+  { key: "nteClient", label: "NTE (Client)", width: 49 },
+  { key: "nte", label: "NTE (Facility)", width: 98 },
+  { key: "bizReq", label: "Business Requirement", width: 98,
+    render: (r) => <WithInfo color={G.alertRed}>{r.bizReq}</WithInfo>, tdStyle: { paddingLeft: 36 } },
+  { key: "response", label: "Response Deadline", width: 98 },
+  { key: "arrival", label: "Arrival Deadline", width: 98 },
+  { key: "completion", label: "Completion Deadline", width: 98 },
+  { key: "menu", label: "", tdStyle: { textAlign: "center" }, render: () => (
+    <Icon cls="fas fa-bars" style={{ fontSize: 15, color: G.icon, cursor: "pointer", fontStyle: "normal" }} />
+  ) },
+];
+
+/* The default vendor's assignment is previewed once facility and category are
+   set; the other columns follow the form. */
+const pendingAssignment = (f) => ({
+  italic: true, id: "Pending", provider: "A&D Electric", phone: "", status: "Pending Creation",
+  facility: f.facility, category: gridCategory(f.category), priority: f.priority || "", cls: f.cls || "",
+  nteClient: "", nte: "", bizReq: "No",
+  response: f.priority ? "11/6/2026, 5:00 PM" : "",
+  arrival: f.priority ? "11/8/2026, 5:00 PM" : "",
+  completion: f.priority ? "11/9/2026, 5:00 PM" : "",
+});
+
+/* Row expander under the assignment: Assignment Scope + Show/Hide Instructions. */
+const AssignmentScope = ({ colSpan }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <tr>
+      <td colSpan={colSpan} style={{ padding: "16px 20px 10px", background: "#fff" }}>
+        <div style={{ fontSize: 12, color: G.muted, marginBottom: 4 }}>Assignment Scope</div>
+        <button
+          onClick={() => setOpen(!open)}
+          style={{
+            background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: "inherit",
+            fontSize: 15, color: "#5F5F5F", display: "inline-flex", alignItems: "center", gap: 10,
+          }}
+        >
+          {open ? "Hide Instructions" : "Show Instructions"}
+          <Icon cls={open ? "fas fa-caret-up" : "fas fa-caret-down"} style={{ fontSize: 13 }} />
+        </button>
+        {open && (
+          <div style={{ marginTop: 8, fontSize: 14, color: G.text, lineHeight: "20px", maxWidth: 720 }}>
+            Clean storefront awning and remove debris. Check fabric and frame for damage and report
+            any repairs needed with photos before leaving site.
+          </div>
+        )}
+      </td>
+    </tr>
+  );
+};
+
+// Service Visits
+const SV_COLUMNS = [
+  { key: "id", label: "ID", width: 63 },
+  ...["Provider", "Status", "Facility", "Category", "Visit Start Time", "Check In", "Check Out", "Time"]
+    .map((l) => ({ key: l, label: l, width: 140 })),
+  { key: "Summary", label: "Summary" },
+];
+
+/* linkedId: the existing work order the user chose to add to. No new
+   assignment is previewed since nothing is dispatched. The Potential
+   Duplicate Work Orders grid was removed: the warning under Category
+   replaces it (grids wait for the new grid style). */
+const WorkOrderGrids = ({ form, linkedId }) => {
+  const ready = form.facility && form.category;
+  const saRows = ready && !linkedId ? [pendingAssignment(form)] : [];
+  const linkedVendor = linkedId && (WO_EXTRA[linkedId] || DEFAULT_EXTRA).vendor;
+
+  return (
+    <div style={{ borderTop: `1px solid ${G.divider}`, boxShadow: "0 -3px 4px -2px rgba(0,0,0,0.08)" }}>
+      <GridPanel title="Service Assignments">
+        <DataGrid
+          columns={SA_COLUMNS}
+          rows={saRows}
+          emptyText={linkedId
+            ? `No new assignment. WO #${linkedId} stays with ${linkedVendor}.`
+            : "No Service Assignments To Display"}
+          renderAfterRow={(r, n) => <AssignmentScope colSpan={n} />}
+        />
+      </GridPanel>
+
+      <GridPanel title="Service Visits" tools={<IconTool icon="fas fa-plus" title="Add visit" />}>
+        <DataGrid columns={SV_COLUMNS} rows={[]} />
+      </GridPanel>
+      <div style={{ height: 60 }} />
+    </div>
+  );
+};
+
+// ─── CALL AVOIDANCE ──────────────────────────────────────────────────────────
+/* Category-configured questions asked on EVERY Save, whether or not a
+   duplicate was found or chosen. Matches the live modal; the one change is
+   that the duplicate question ("Similar Work Orders were found for this
+   facility. Have you confirmed that this Work Order is not a duplicate?")
+   is dropped, because the duplicate warning under Category already asked it.
+   When the user chose to add to an existing work order, the main button is
+   ADD TO WO #… instead of SAVE WORK ORDER (one modal, not two).
+   PENDING (Molly): whether that question is per-category config or added
+   by the system, and what CALL AVOIDED does with the form.
+   Plumbing questions come from the live modal (options besides "Backup" are
+   placeholders). Awning, Electrical and the fallback set are PLACEHOLDERS. */
+
+const CALL_AVOIDANCE = {
+  Plumbing: {
+    title: "General Plumbing Category Call Avoidance Questions",
+    questions: [
+      { key: "type", text: "What type of issue are you experiencing?", options: ["Backup", "Leak", "No Water", "Other"] },
+      {
+        key: "cleaners", text: "Did you attempt to resolve this backup with consumer-grade cleaners?",
+        options: ["Yes", "No"], showIf: (a) => a.type === "Backup",
+      },
+    ],
+  },
+};
+
+CALL_AVOIDANCE.Awning = {
+  title: "Awning Category Call Avoidance Questions",
+  questions: [
+    { key: "hazard", text: "Is the awning a safety hazard right now (sagging, loose, or blocking an entrance)?", options: ["Yes", "No"] },
+    { key: "weather", text: "Was the damage caused by recent weather?", options: ["Yes", "No", "Not sure"] },
+  ],
+};
+CALL_AVOIDANCE.Electrical = {
+  title: "Electrical Category Call Avoidance Questions",
+  questions: [
+    { key: "breaker", text: "Have you checked the breaker panel for a tripped breaker?", options: ["Yes", "No"] },
+    { key: "bulb", text: "Have you tried replacing the bulb?", options: ["Yes", "No", "Not applicable"] },
+  ],
+};
+const callAvoidanceFor = (category) => {
+  if (!category) return null;
+  const parent = category.split(" > ")[0];
+  return CALL_AVOIDANCE[parent] || {
+    title: `${parent} Category Call Avoidance Questions`,
+    questions: [{ key: "onsite", text: "Have you tried to resolve this issue on site?", options: ["Yes", "No"] }],
+  };
+};
+
+/* addTo: the existing work order being added to, or null when creating. */
+const CallAvoidanceDialog = ({ config, addTo, addKind, saving, onCallAvoided, onSave, onClose }) => {
+  // × or Escape closes the modal and returns to the form with everything kept.
+  useEffect(() => {
+    const k = (e) => { if (e.key === "Escape" && !saving) onClose(); };
+    document.addEventListener("keydown", k);
+    return () => document.removeEventListener("keydown", k);
+  }, [onClose, saving]);
+  const [answers, setAnswers] = useState({});
+  const [tried, setTried] = useState(false);
+  const visible = config.questions.filter((q) => !q.showIf || q.showIf(answers));
+  const unanswered = visible.filter((q) => !answers[q.key]);
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 400,
+      display: "flex", alignItems: "center", justifyContent: "center",
+    }}>
+      <div style={{
+        width: 620, maxWidth: "92vw", minHeight: 460, maxHeight: "88vh", background: "#fff",
+        display: "flex", flexDirection: "column",
+        boxShadow: "0 11px 15px -7px rgba(0,0,0,.2), 0 24px 38px 3px rgba(0,0,0,.14), 0 9px 46px 8px rgba(0,0,0,.12)",
+      }}>
+        <div style={{
+          background: "#F4F4F4", padding: "18px 12px 18px 16px", fontSize: 19, fontWeight: 500, color: "#757575",
+          display: "flex", alignItems: "center", gap: 12,
+        }}>
+          <span style={{ flex: 1 }}>{config.title}</span>
+          <button
+            onClick={onClose}
+            disabled={saving}
+            title="Close"
+            aria-label="Close"
+            style={{
+              width: 32, height: 32, border: "none", background: "none", cursor: saving ? "default" : "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "50%", padding: 0,
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.06)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "none"; }}
+          >
+            <Icon cls="fas fa-times" style={{ fontSize: 16, color: "#757575" }} />
+          </button>
+        </div>
+        <div style={{ flex: 1, overflowY: "auto", padding: "8px 16px 20px" }}>
+          {visible.map((q) => (
+            <div key={q.key} style={{ marginTop: 14 }}>
+              <ComboField
+                label={q.text}
+                labelStyle={{ fontSize: 15, lineHeight: "20px", color: C.text, letterSpacing: 0 }}
+                options={q.options}
+                value={answers[q.key] || null}
+                onChange={(v) => setAnswers((a) => ({ ...a, [q.key]: v }))}
+                error={tried && !answers[q.key]}
+              />
+              {tried && !answers[q.key] && (
+                <div style={{ fontSize: 12, color: G.alertRed, marginTop: 4 }}>Choose an answer.</div>
+              )}
+            </div>
+          ))}
+        </div>
+        {addTo && (
+          <div style={{
+            margin: "0 16px 16px", padding: "10px 12px", background: "#F6F6F6",
+            fontSize: 13, lineHeight: "18px", color: C.text, display: "flex", gap: 10,
+          }}>
+            <Icon cls="fas fa-info-circle" style={{ fontSize: 14, color: "#757575", marginTop: 2 }} />
+            <span>
+              <strong style={{ fontWeight: 600 }}>No new work order will be created.</strong>{" "}
+              {addKind === "recall"
+                ? <>WO #{addTo.id}'s status changes to Recall, and your description and photos are added to it. </>
+                : <>Your description and photos will be added to WO #{addTo.id}. </>}
+              Its priority stays {addTo.priority}, and {(WO_EXTRA[addTo.id] || DEFAULT_EXTRA).vendor} is notified
+              {addKind === "recall" ? " of the recall." : " that the description changed."}
+            </span>
+          </div>
+        )}
+        <div style={{ background: "#F4F4F4", display: "flex", justifyContent: "flex-end", gap: 2, padding: 8 }}>
+          <ActionButton color={G.alertRed} hoverColor="#D32F2F" onClick={onCallAvoided}>Call avoided</ActionButton>
+          <ActionButton
+            disabled={saving}
+            onClick={() => { setTried(true); if (!unanswered.length) onSave(answers); }}
+          >
+            {addTo
+              ? (saving ? "Saving…" : addKind === "recall" ? `Recall WO #${addTo.id}` : `Add to WO #${addTo.id}`)
+              : "Save work order"}
+          </ActionButton>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── PROTOTYPE SETTINGS (not part of production) ─────────────────────────────
+
+const PRESETS = [
+  {
+    key: "one",
+    title: "Flow 1: One duplicate",
+    note: "Duplicate WO #619, plus 1 possible recall. Pick one, then save.",
+    form: {
+      client: "Michaels", facility: "E-Corp 0001", cls: "Reactive Maintenance",
+      category: "Awning > Cleaning", priority: "48 Hour",
+      description: "Awning over the main entrance is covered in bird droppings. Customers are complaining.",
+      photos: ["photo-1.jpg"],
+    },
+  },
+  {
+    key: "five",
+    title: "Flow 2: Five duplicates",
+    note: "Duplicates WO #621, #617, #609, #598, #584, plus 2 possible recalls. Pick one, then save.",
+    form: {
+      client: "Michaels", facility: "E-Corp 0001", cls: "Reactive Maintenance",
+      category: "Electrical > Lighting", priority: "24 Hour",
+      description: "Second fixture by the stockroom door is flickering too.",
+      photos: ["photo-1.jpg", "photo-2.jpg"],
+    },
+  },
+  {
+    key: "ca-dup",
+    title: "Flow 3: Plumbing, new issue",
+    note: "Duplicate WO #615, plus 2 possible recalls. Choose any option, then save.",
+    form: {
+      client: "Michaels", facility: "Pitstop 0001", cls: "Reactive Maintenance",
+      category: "Plumbing > Clog", priority: "24 Hour",
+      description: "Sink in the employee breakroom is draining very slowly.",
+      photos: [],
+    },
+  },
+  {
+    key: "ca-none",
+    title: "Flow 4: Plumbing, no duplicates",
+    note: "No duplicates; 2 possible recalls. Pick one to mark it as a recall, then save.",
+    form: {
+      client: "Michaels", facility: "Pitstop 0001", cls: "Reactive Maintenance",
+      category: "Plumbing > Leak", priority: "48 Hour",
+      description: "Water pooling under the sink in the front restroom.",
+      photos: [],
+    },
+  },
+];
+
+const PrototypeSettings = ({ onLoad, onReset }) => {
+  const [open, setOpen] = useState(false);
+  const ref = React.useRef(null);
+  const close = React.useCallback(() => setOpen(false), []);
+  useOutsideClose(ref, close);
+
+  const Line = ({ k, v }) => (
+    <div style={{ display: "flex", gap: 8, fontSize: 12, lineHeight: "17px" }}>
+      <span style={{ width: 72, flexShrink: 0, color: "#8A97A0" }}>{k}</span>
+      <span style={{ color: "#1E2A32", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v}</span>
+    </div>
+  );
+
+  return (
+    <div ref={ref} style={{ position: "fixed", left: 16, bottom: 16, zIndex: 600, fontFamily: "Roboto, sans-serif" }}>
+      {open && (
+        <div style={{
+          position: "absolute", left: 0, bottom: 48, width: 320, background: "#fff", borderRadius: 10,
+          boxShadow: "0 10px 30px rgba(0,0,0,0.25)", overflowY: "auto", maxHeight: "calc(100vh - 90px)",
+        }}>
+          <div style={{ background: "#1E2A32", color: "#fff", padding: "12px 14px", display: "flex", alignItems: "center", gap: 8 }}>
+            <Icon cls="fas fa-flask" style={{ fontSize: 13, color: "#F58D23" }} />
+            <span style={{ fontSize: 14, fontWeight: 600 }}>Prototype Settings</span>
+            <div style={{ flex: 1 }} />
+            <span onClick={close} style={{ cursor: "pointer", lineHeight: 0 }}>
+              <Icon cls="fas fa-times" style={{ fontSize: 13, color: "#9FB2BD" }} />
+            </span>
+          </div>
+          <div style={{ padding: "10px 14px 4px", fontSize: 12, color: "#8A97A0" }}>
+            Not part of production. Each flow fills the form and opens its duplicate check.
+          </div>
+          <div style={{ padding: "6px 14px 14px", display: "flex", flexDirection: "column", gap: 10 }}>
+            {PRESETS.map((p) => (
+              <div key={p.key} style={{ border: "1px solid #E1E9ED", borderRadius: 8, padding: 12 }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: "#1E2A32" }}>{p.title}</span>
+                </div>
+                <div style={{ fontSize: 12, color: "#5A6B75", margin: "2px 0 8px" }}>{p.note}</div>
+                <Line k="Facility" v={p.form.facility} />
+                <Line k="Class" v={p.form.cls} />
+                <Line k="Category" v={p.form.category} />
+                <Line k="Priority" v={p.form.priority} />
+                <Line k="Description" v={p.form.description} />
+                <Line k="Photos" v={p.form.photos.join(", ")} />
+                <button
+                  onClick={() => { onLoad(p.form); close(); }}
+                  style={{
+                    marginTop: 10, width: "100%", padding: "8px 0", border: "none", borderRadius: 6,
+                    background: "#1E2A32", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  Load this flow
+                </button>
+              </div>
+            ))}
+            <button
+              onClick={() => { onReset(); close(); }}
+              style={{
+                padding: "8px 0", border: "1px solid #C9D3D9", borderRadius: 6, background: "#fff",
+                color: "#1E2A32", fontSize: 13, cursor: "pointer", fontFamily: "inherit",
+              }}
+            >
+              Reset to empty form
+            </button>
+          </div>
+        </div>
+      )}
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          display: "flex", alignItems: "center", gap: 8, padding: "9px 14px", borderRadius: 22, border: "none",
+          background: "#1E2A32", color: "#fff", fontSize: 12.5, fontWeight: 600, cursor: "pointer",
+          boxShadow: "0 4px 14px rgba(0,0,0,0.28)", fontFamily: "inherit",
+        }}
+      >
+        <Icon cls="fas fa-flask" style={{ fontSize: 13, color: "#F58D23" }} />
+        Prototype Settings
+        <Icon cls={open ? "fas fa-chevron-down" : "fas fa-chevron-up"} style={{ fontSize: 10, color: "#9FB2BD" }} />
+      </button>
+    </div>
+  );
+};
+
+// ─── PAGE ────────────────────────────────────────────────────────────────────
+
+function App() {
+  useFontAwesome();
+  const [capitalExpense, setCapitalExpense] = useState(false);
+  const [noDefaultVendor, setNoDefaultVendor] = useState(false);
+  const [callAvoided, setCallAvoided] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(true);
+  const blankForm = { client: "Michaels", facility: null, cls: null, category: null, priority: null, description: "", photos: [] };
+  const [form, setForm] = useState(blankForm);
+  const set = (k) => (v) => setForm((f) => ({ ...f, [k]: v }));
+
+  // Duplicate handling
+  const matches = findDuplicates(form);
+  const recalls = findRecalls(form);
+  // null = not answered yet, "new" = a new issue, otherwise the id of the work order to add to
+  const [choice, setChoice] = useState(null);
+  const [dupError, setDupError] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [view, setView] = useState("create"); // "create" | "wo" (after adding) | "peek" (opened from the warning)
+  const [peekWo, setPeekWo] = useState(null);
+  const [callAvoidOpen, setCallAvoidOpen] = useState(false);
+  const [addedWo, setAddedWo] = useState(null);
+  const [toast, setToast] = useState(null);
+  const [formKey, setFormKey] = useState(0);
+  const clearToast = React.useCallback(() => setToast(null), []);
+  const calloutRef = React.useRef(null);
+
+  // A new facility/category pair is a new question: clear the answer.
+  useEffect(() => {
+    setChoice(null);
+    setDupError(false);
+  }, [form.facility, form.category]);
+
+  const choose = (c) => { setChoice(c); setDupError(false); };
+
+  const linkedWo = choice && choice !== "new"
+    ? (EXISTING_WOS.find((w) => w.id === choice) || RECENT_WOS.find((w) => w.id === choice))
+    : null;
+  const linked = !!linkedWo;
+  // "add" = add details to a duplicate; "recall" = mark a recent work order as a recall
+  const linkKind = linked ? (matches.some((m) => m.id === choice) ? "add" : "recall") : null;
+  const hasDescription = form.description.trim().length > 0;
+
+  const nowLabel = () => {
+    const d = new Date();
+    return d.toLocaleDateString("en-US") + " " + d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  };
+
+  const addToExisting = () => {
+    setSaving(true);
+    setTimeout(() => {
+      const extra = WO_EXTRA[linkedWo.id] || DEFAULT_EXTRA;
+      setAddedWo({
+        ...linkedWo, ...extra,
+        ...(linkKind === "recall" ? { status: "Recall" } : {}),
+        additions: [{ by: "Jose Quevedo", at: nowLabel(), text: form.description.trim() }],
+        photos: [...extra.photos, ...form.photos],
+        newPhotos: form.photos.length,
+      });
+      setSaving(false);
+      setConfirmOpen(false);
+      setCallAvoidOpen(false);
+      setView("wo");
+      setToast(linkKind === "recall"
+        ? `Work Order #${linkedWo.id} was marked as a recall. No new work order was created.`
+        : `Your details were added to Work Order #${linkedWo.id}. No new work order was created.`);
+    }, 700);
+  };
+
+  const missing = [
+    ["Client", form.client], ["Facility", form.facility], ["Class", form.cls],
+    ["Category", form.category], ["Priority", form.priority], ["Description", hasDescription],
+  ].filter(([, v]) => !v).map(([k]) => k);
+
+  /* Save:
+     - match found, no answer yet → the duplicate box turns red and scrolls into view
+     - added to an existing work order → needs a description, then a confirmation
+     - new issue, or no match → normal required-field check, then create */
+  const closeCallAvoid = React.useCallback(() => setCallAvoidOpen(false), []);
+
+  const createWorkOrder = () => {
+    setCallAvoidOpen(false);
+    setToast("Work Order #625 created");
+    resetForm();
+  };
+
+  // PENDING (Molly): what CALL AVOIDED does today. Prototype: discard and confirm.
+  const markCallAvoided = () => {
+    setCallAvoidOpen(false);
+    setToast("Call avoided. No work order was created.");
+    resetForm();
+  };
+
+  /* Opening a match from the warning: the work order opens in its own tab and
+     the form keeps everything entered, so the user can come back and choose. */
+  const openWo = (id) => {
+    const w = EXISTING_WOS.find((x) => x.id === id) || RECENT_WOS.find((x) => x.id === id);
+    const extra = WO_EXTRA[id] || DEFAULT_EXTRA;
+    setPeekWo({ ...w, ...extra, additions: [], newPhotos: 0 });
+    setView("peek");
+  };
+
+  const save = () => {
+    if ((matches.length || recalls.length) && !choice) {
+      setDupError(true);
+      if (calloutRef.current) calloutRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    if (linked) {
+      if (!hasDescription) { setToast("Fill in the required fields: Description"); return; }
+      setCallAvoidOpen(true);
+      return;
+    }
+    if (missing.length) { setToast(`Fill in the required fields: ${missing.join(", ")}`); return; }
+    setCallAvoidOpen(true);
+  };
+
+  const resetForm = () => {
+    setForm(blankForm);
+    setChoice(null);
+    setDupError(false);
+    setPeekWo(null);
+    setFormKey((k) => k + 1);
+  };
+
+  /* Prototype settings: fill the form with a flow's values, then bring the
+     duplicate check into view. */
+  const loadPreset = (values) => {
+    setForm({ ...blankForm, ...values });
+    setChoice(null);
+    setDupError(false);
+    setConfirmOpen(false);
+    setCallAvoidOpen(false);
+    setAddedWo(null);
+    setPeekWo(null);
+    setView("create");
+    setFormKey((k) => k + 1);
+    setTimeout(() => {
+      if (calloutRef.current) calloutRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 150);
+  };
+
+  const startOver = () => {
+    resetForm();
+    setAddedWo(null);
+    setView("create");
+  };
+
+  const tabs = view === "wo"
+    ? [{ key: "list", label: "Work Orders" }, { key: "114695", label: "Work Order # 114695" }, { key: "wo", label: `Work Order # ${addedWo.id}` }]
+    : [
+        { key: "list", label: "Work Orders" }, { key: "create", label: "Create Work Order" },
+        ...(peekWo ? [{ key: "peek", label: `Work Order # ${peekWo.id}` }] : []),
+      ];
+
+  return (
+    <div style={{
+      display: "flex", height: "100vh", overflow: "hidden", background: "#fff",
+      fontFamily: "Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    }}>
+      <Sidebar />
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <TopBar />
+        <TabBar
+          tabs={tabs}
+          active={view}
+          onSelect={(k) => { if (k === "create" || (k === "peek" && peekWo)) setView(k); }}
+        />
+
+        {view === "wo" || view === "peek" ? (
+          <WorkOrderOverviewPage wo={view === "wo" ? addedWo : peekWo} />
+        ) : (
+        <React.Fragment key={formKey}>
+        {/* Title band */}
+        <div style={{
+          background: C.titleBandBg, padding: "18px 24px 14px", flexShrink: 0,
+          display: "flex", alignItems: "center",
+        }}>
+          <span style={{ fontSize: 22, color: "#5f6b70" }}>Create Work Order</span>
+          <div style={{ flex: 1 }} />
+          <button onClick={save} title="Save" style={{ background: "none", border: "none", cursor: "pointer", color: C.saveBtn, padding: 0 }}>
+            <Icon cls="far fa-save" style={{ fontSize: 26 }} />
+          </button>
+        </div>
+
+        <main style={{ flex: 1, overflow: "auto" }}>
+          <div style={{
+            display: "grid", gridTemplateColumns: "1fr 1fr 1fr", columnGap: 60,
+            padding: "8px 24px 36px", alignItems: "start",
+          }}>
+            {/* LEFT */}
+            <div>
+              <ComboField label="Client" required options={CLIENTS} value={form.client} onChange={set("client")} />
+              <Gap h={8} />
+              <ComboField label="Facility" required options={FACILITIES} value={form.facility} onChange={set("facility")} error={!form.facility} />
+              <Gap h={34} />
+              <ComboField label="Class" required options={CLASSES} value={form.cls} onChange={set("cls")} />
+              <Gap h={34} />
+              <CategoryCombo value={form.category} onChange={set("category")} />
+              {(matches.length > 0 || recalls.length > 0) && (
+                <DuplicateCallout
+                  ref={calloutRef} form={form} matches={matches} recalls={recalls}
+                  choice={choice} onChoose={choose} onOpen={openWo} error={dupError}
+                />
+              )}
+              <Locked on={linked}>
+                <Gap h={34} />
+                <Field label="Area" select />
+                <Gap h={34} />
+                <Field label="Asset" select />
+                <Gap h={26} />
+                <div style={{ paddingTop: 8, minHeight: 44 }}>
+                  <div style={{ fontSize: 12, color: C.fieldLabel, marginBottom: 8 }}>Capital Expense</div>
+                  <Toggle on={capitalExpense} onChange={() => setCapitalExpense(!capitalExpense)} />
+                </div>
+              </Locked>
+            </div>
+
+            {/* MIDDLE */}
+            <div>
+              <DescriptionField value={form.description} onChange={set("description")} />
+              <PhotosField photos={form.photos} onChange={set("photos")} />
+              <Gap h={34} />
+              {linked ? (
+                <>
+                  <Locked on>
+                    <Field label="Priority" required select value={linkedWo.priority} />
+                  </Locked>
+                  <div style={{ fontSize: 12, color: G.muted, marginTop: 6 }}>
+                    Kept from WO #{linkedWo.id}. Priority can't be changed when adding details.
+                  </div>
+                </>
+              ) : (
+                <ComboField label="Priority" required options={PRIORITIES} value={form.priority} onChange={set("priority")} />
+              )}
+              <Locked on={linked}>
+                <Gap h={30} />
+                <Field label="Assignee" select />
+                <Gap h={30} />
+                <Field label="Responsible Party" select />
+                <Gap h={30} />
+                <Field label="Responsible Party Threshold" />
+                <Gap h={30} />
+                <Field label="PO Number" />
+              </Locked>
+            </div>
+
+            {/* RIGHT */}
+            <Locked on={linked}>
+              <Gap h={4} />
+              <EtaRow />
+
+              <div style={{ display: "flex", gap: 60, marginTop: 26 }}>
+                <div>
+                  <div style={{ fontSize: 14, color: C.text, marginBottom: 10 }}>Do Not Assign Default Vendor</div>
+                  <Toggle on={noDefaultVendor} onChange={() => setNoDefaultVendor(!noDefaultVendor)} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 14, color: C.text, marginBottom: 10 }}>Call Avoided</div>
+                  <Toggle on={callAvoided} onChange={() => setCallAvoided(!callAvoided)} />
+                </div>
+              </div>
+
+              <div
+                onClick={() => setShowInstructions(!showInstructions)}
+                style={{ marginTop: 22, display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}
+              >
+                <span style={{ fontSize: 14, fontWeight: 700, color: C.linkBlue, textDecoration: "underline" }}>
+                  {showInstructions ? "Hide Instructions" : "Show Instructions"}
+                </span>
+                <Icon cls={showInstructions ? "fas fa-caret-up" : "fas fa-caret-down"} style={{ fontSize: 13, color: C.linkBlue }} />
+              </div>
+
+              {showInstructions && (
+                <>
+                  <TallField label="IVR Instructions" height={170} />
+                  <TallField label="Special Instructions" height={190} />
+                </>
+              )}
+
+              <Gap h={30} />
+              <Field label="CAN" select />
+              <Gap h={30} />
+              <Field label="Label" />
+            </Locked>
+          </div>
+
+          <WorkOrderGrids form={form} linkedId={linked ? linkedWo.id : null} />
+        </main>
+        </React.Fragment>
+        )}
+      </div>
+
+      {false && confirmOpen && linked && ( /* replaced by the call avoidance modal's add mode */
+        <ConfirmAddDialog
+          wo={linkedWo} form={form} saving={saving}
+          onBack={() => setConfirmOpen(false)} onConfirm={addToExisting}
+        />
+      )}
+      {callAvoidOpen && callAvoidanceFor(form.category) && (
+        <CallAvoidanceDialog
+          config={callAvoidanceFor(form.category)}
+          onCallAvoided={markCallAvoided}
+          addTo={linkedWo}
+          addKind={linkKind}
+          saving={saving}
+          onSave={linked ? addToExisting : createWorkOrder}
+          onClose={closeCallAvoid}
+        />
+      )}
+      {toast && <Toast text={toast} onDone={clearToast} />}
+      <PrototypeSettings onLoad={loadPreset} onReset={startOver} />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

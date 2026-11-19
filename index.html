@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fexa Mockups</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+<style>
+  :root { --navy: #073B56; --primary: #21B8BF; --primary-50: #E3F5F6; --text: #343434; --text-secondary: #6E6E6E; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Open Sans', sans-serif; background: #F4F6F6; color: var(--text); }
+  header { background: var(--navy); color: #fff; padding: 48px 24px 40px; }
+  .header-inner, main { max-width: 1040px; margin: 0 auto; }
+  header h1 { font-family: 'Roboto', sans-serif; font-weight: 500; font-size: 28px; }
+  header p { margin-top: 6px; opacity: 0.8; font-size: 15px; }
+  main { padding: 32px 24px 48px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+  .card { display: block; background: #fff; border-radius: 12px; padding: 24px; text-decoration: none; color: inherit;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08); transition: box-shadow .15s, transform .15s; }
+  .card:hover { box-shadow: 0 6px 18px rgba(0,0,0,0.12); transform: translateY(-2px); }
+  .card .icon { font-family: 'Material Icons Outlined'; font-size: 28px; color: var(--primary); background: var(--primary-50);
+    width: 52px; height: 52px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+  .card h2 { font-family: 'Roboto', sans-serif; font-weight: 500; font-size: 18px; }
+  .card p { margin-top: 6px; font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+  .card .go { margin-top: 16px; font-size: 13px; font-weight: 600; color: var(--primary); display: flex; align-items: center; gap: 4px; }
+  .card .go .material-icons-outlined { font-family: 'Material Icons Outlined'; font-size: 16px; }
+  footer { text-align: center; color: var(--text-secondary); font-size: 13px; padding-bottom: 40px; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <h1>Fexa Mockups</h1>
+      <p>Interactive prototypes and design explorations</p>
+    </div>
+  </header>
+  <main>
+    <div class="grid">
+      <a class="card" href="fifi/">
+        <div class="icon">build</div>
+        <h2>Create Work Order</h2>
+        <p>Michaels Create Work Order with duplicate and recall checks, call avoidance, and add-to-existing flow.</p>
+        <div class="go">Open prototype <span class="material-icons-outlined">arrow_forward</span></div>
+      </a>
+    </div>
+  </main>
+  <footer>Fexa</footer>
+</body>
+</html>
