@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FexaAI — Duplicate &amp; Recall Visibility (FIFI-458)</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&family=Roboto:wght@400;500;700&family=DM+Mono&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js" defer></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;font-family:'Open Sans',sans-serif;color:#343434;}
+.page{display:flex;height:100vh;overflow:hidden;}
+.chat-panel{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;background:#fff;overflow:hidden;}
+
+/* ── Form panel ── */
+.form-panel{width:34%;min-width:320px;max-width:430px;display:flex;flex-direction:column;background:#fff;overflow:hidden;border-left:1px solid #e5e7eb;}
+.form-header{padding:18px 24px 14px;flex-shrink:0;}
+.form-header-top{display:flex;align-items:flex-start;justify-content:space-between;}
+.form-title{font-size:16px;font-weight:400;color:#343434;line-height:24px;}
+.form-menu-btn{border:none;background:transparent;cursor:pointer;padding:4px;display:flex;align-items:center;color:#343434;font-size:20px;}
+.form-link{display:inline-flex;align-items:center;gap:5px;cursor:pointer;text-decoration:none;margin-top:2px;}
+.form-link span{font-size:13px;color:#C678FA;}
+.form-link i{font-size:10px;color:#C678FA;}
+.form-scroll{flex:1;overflow-y:auto;padding:6px 24px 20px;scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.08) transparent;}
+.form-scroll::-webkit-scrollbar{width:4px;}
+.form-scroll::-webkit-scrollbar-thumb{background:rgba(0,0,0,.08);border-radius:4px;}
+.form-fields{display:flex;flex-direction:column;gap:20px;}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field-label{font-size:13px;font-weight:400;color:#9e9e9e;line-height:18px;}
+.field-input{height:50px;border:1px solid #d0d0d0;border-radius:8px;padding:0 14px;display:flex;align-items:center;position:relative;font-size:14px;color:#343434;background:#fff;}
+.field-input input{width:100%;border:none;background:transparent;outline:none;font-size:14px;color:#343434;font-family:'Open Sans',sans-serif;padding-right:22px;}
+.field-input input::placeholder{color:#c9d2d6;}
+.field-input .chevron{position:absolute;right:14px;font-size:11px;color:#9e9e9e;}
+.field-textarea{border:1px solid #d0d0d0;border-radius:8px;padding:12px 14px;min-height:80px;resize:vertical;font-size:14px;color:#343434;font-family:'Open Sans',sans-serif;line-height:22px;width:100%;outline:none;background:#fff;}
+@keyframes field-flash{0%{background:#E8F7D8;border-color:#89C826;}100%{background:#fff;border-color:#d0d0d0;}}
+.flash{animation:field-flash 1.8s ease;}
+.field-input .warn{position:absolute;right:38px;color:#F0A020;font-size:13px;display:none;}
+.field-input .warn.show{display:inline;}
+.panel-footer{flex-shrink:0;border-top:1px solid #E1E9ED;padding:12px 24px;display:flex;justify-content:flex-end;background:#fff;}
+.btn-submit{height:38px;padding:0 22px;border:none;border-radius:4px;background:#89C826;color:#fff;font-family:'Roboto',sans-serif;font-size:13px;font-weight:700;letter-spacing:.6px;cursor:pointer;box-shadow:0 2px 2px 0 rgba(0,0,0,.14),0 1px 5px 0 rgba(0,0,0,.12);}
+.btn-submit:hover{background:#7AB520;}
+
+/* ── Sub-header ── */
+.sub-header{display:flex;height:52px;min-height:52px;background:#fff;border-bottom:1px solid rgba(0,0,0,.08);align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;position:relative;}
+.new-chat-btn{display:flex;align-items:center;gap:6px;height:40px;padding:4px 8px;background:transparent;border:none;border-radius:8px;cursor:pointer;font-family:'Open Sans',sans-serif;font-size:12px;color:rgba(0,0,0,.7);}
+.new-chat-btn:hover{background:rgba(0,0,0,.03);}
+.new-chat-btn i{font-size:14px;color:rgba(0,0,0,.45);}
+.wo-title{position:absolute;left:50%;transform:translateX(-50%);font-size:14px;font-weight:600;color:#424242;letter-spacing:.15px;white-space:nowrap;}
+.status-group{display:flex;align-items:center;gap:10px;}
+.step-label{font-family:'Inter',sans-serif;font-size:11px;color:rgba(0,0,0,.45);letter-spacing:.17px;}
+.step-dot{width:6px;height:6px;border-radius:50%;background:#4caf50;box-shadow:0 0 5px rgba(76,175,80,.4);}
+@media (max-width:1180px){.wo-title{display:none;}}
+
+/* ── Messages ── */
+.messages{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 28px 8px;display:flex;flex-direction:column;gap:22px;min-height:0;scrollbar-width:none;}
+.messages::-webkit-scrollbar{display:none;}
+.msg{animation:msg-in .3s ease;}
+@keyframes msg-in{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+.msg-user{display:flex;justify-content:flex-end;align-items:flex-start;gap:10px;}
+.msg-user-bubble{background:#FBEEFF;color:rgba(0,0,0,.8);font-size:15px;line-height:24px;padding:10px 18px;border-radius:18px;max-width:70%;box-shadow:0 4px 9px rgba(0,0,0,.2);}
+.msg-user-icon{flex-shrink:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.msg-ai{display:flex;align-items:flex-start;gap:10px;}
+.msg-ai-avatar{flex-shrink:0;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#e8d5f5,#b8e6e8,#f5d5e8);margin-top:2px;position:relative;overflow:hidden;}
+.msg-ai-avatar::after{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.4),transparent 60%);}
+.msg-ai-content{display:flex;flex-direction:column;gap:4px;max-width:80%;min-width:0;}
+.msg-ai-text{background:rgba(0,0,0,.04);border-radius:14px;padding:12px 18px;font-size:14px;line-height:26px;color:#343434;box-shadow:0 4px 9px rgba(0,0,0,.2);}
+.msg-ai-text strong{font-weight:700;}
+
+.chips{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.chip{height:32px;padding:0 14px;border-radius:16px;border:1px solid #21B8BF;background:#fff;color:#21B8BF;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;}
+.chip:hover{background:#21B8BF;color:#fff;}
+.chip.ghost{border-color:#d0d0d0;color:rgba(0,0,0,.45);}
+.chip.ghost:hover{background:#f3f3f3;color:rgba(0,0,0,.6);}
+.chips.spent{display:none;}
+
+/* ── Duplicate / recall card ── */
+.dr-card{background:#fff;border:1px solid #E1E9ED;border-radius:14px;box-shadow:0 4px 9px rgba(0,0,0,.12);overflow:hidden;margin-top:2px;}
+.dr-banner{display:flex;align-items:center;gap:8px;padding:10px 16px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:#8A5A00;background:#FDF3E0;border-bottom:1px solid #F6E4C4;}
+.dr-banner i{font-size:13px;color:#F0A020;}
+.dr-set{border-bottom:1px solid #F2F4F5;}
+.dr-set:last-of-type{border-bottom:none;}
+.dr-set-head{display:flex;align-items:center;justify-content:space-between;padding:11px 16px 6px;}
+.dr-set-title{display:flex;align-items:center;gap:7px;font-family:'Roboto',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;color:#34515E;text-transform:uppercase;}
+.dr-tag{font-size:9px;font-weight:700;letter-spacing:.3px;border-radius:3px;padding:2px 6px;font-family:'Roboto',sans-serif;}
+.dr-tag.dup{color:#8A5A00;background:#FDF0D8;}
+.dr-tag.recall{color:#9C2B2B;background:#FBE0E0;}
+.dr-count{font-size:10.5px;color:#9e9e9e;font-family:'DM Mono',monospace;font-weight:400;letter-spacing:0;text-transform:none;}
+.dr-row{display:flex;align-items:flex-start;gap:12px;padding:10px 16px;border-top:1px solid #F5F7F8;}
+.dr-row:first-of-type{border-top:none;}
+.dr-id{font-family:'DM Mono',monospace;font-size:12px;color:#21B8BF;font-weight:600;white-space:nowrap;padding-top:1px;cursor:pointer;}
+.dr-id:hover{text-decoration:underline;}
+.dr-body{flex:1;min-width:0;}
+.dr-desc{font-size:12.5px;line-height:18px;color:#343434;}
+.dr-meta{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:5px;font-size:10.5px;color:#7a8790;font-family:'DM Mono',monospace;}
+.dr-pill{display:inline-flex;align-items:center;gap:4px;}
+.dr-status{padding:1px 6px;border-radius:3px;font-weight:600;font-family:'Roboto',sans-serif;letter-spacing:.2px;}
+.dr-status.open{color:#1E6F3C;background:#E4F5E8;}
+.dr-status.progress{color:#1F5C8A;background:#E1EEF8;}
+.dr-status.recall{color:#9C2B2B;background:#FBE0E0;}
+.dr-prio{color:#B26A00;}
+.dr-open-btn{border:1px solid #d0d0d0;background:#fff;border-radius:14px;height:28px;padding:0 12px;font-family:'Inter',sans-serif;font-size:11px;font-weight:500;color:#5A7F93;cursor:pointer;white-space:nowrap;align-self:center;}
+.dr-open-btn:hover{border-color:#21B8BF;color:#21B8BF;}
+.dr-more{padding:8px 16px;font-size:11px;color:#5A7F93;background:#F8FAFB;border-top:1px solid #F2F4F5;cursor:pointer;}
+.dr-more:hover{color:#21B8BF;}
+.dr-foot{display:flex;gap:8px;padding:12px 16px;border-top:1px solid #F2F4F5;flex-wrap:wrap;}
+.dr-act{height:32px;padding:0 14px;border-radius:16px;border:1px solid #21B8BF;background:#21B8BF;color:#fff;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;}
+.dr-act:hover{background:#1AA0A6;border-color:#1AA0A6;}
+.dr-act.ghost{background:#fff;color:#5A7F93;border-color:#d0d0d0;font-weight:500;}
+.dr-act.ghost:hover{border-color:#21B8BF;color:#21B8BF;}
+
+/* ── Table variant (matches the other agent's WO table) ── */
+.drt-card{background:#fff;border:1px solid #E6E8EC;border-radius:16px;box-shadow:0 4px 14px rgba(0,0,0,.08);overflow:hidden;margin-top:2px;}
+.drt-banner{display:flex;align-items:center;gap:8px;padding:11px 20px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:#8A5A00;background:#FDF3E0;border-bottom:1px solid #F6E4C4;}
+.drt-banner i{font-size:13px;color:#F0A020;}
+.drt-scroll{overflow-x:auto;}
+.drt{width:100%;border-collapse:collapse;font-family:'Inter',sans-serif;}
+.drt thead th{text-align:left;font-size:12px;font-weight:700;letter-spacing:.5px;color:#5B6470;text-transform:uppercase;padding:16px 18px;white-space:nowrap;}
+.drt tbody td{padding:16px 18px;font-size:14.5px;color:#2C3038;vertical-align:top;border-top:1px solid #EEF0F3;}
+.drt tbody tr:nth-child(even){background:#FAFBFC;}
+.drt-secthead td{background:#F3F4F6 !important;padding:8px 18px;border-top:1px solid #E6E8EC;}
+.drt-secthead span{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#4A5560;display:inline-flex;align-items:center;gap:8px;}
+.drt-wo{color:#7A5AF0;font-weight:600;cursor:pointer;font-variant-numeric:tabular-nums;}
+.drt-wo:hover{text-decoration:underline;}
+.drt-desc{max-width:340px;line-height:20px;}
+.drt-age{color:#8A93A0;white-space:nowrap;}
+.drt-badge{display:inline-block;padding:6px 12px;border-radius:16px;font-size:13px;font-weight:600;white-space:nowrap;}
+.drt-badge.open{background:#E4F5E8;color:#1E6F3C;}
+.drt-badge.progress{background:#E1EEF8;color:#1F5C8A;}
+.drt-badge.recall{background:#FBE0E0;color:#9C2B2B;}
+.drt-more{text-align:center;padding:15px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;color:#7A5AF0;cursor:pointer;border-top:1px solid #EEF0F3;}
+.drt-more:hover{color:#5B3FD0;}
+.drt-more i{font-size:11px;margin-left:4px;}
+.drt-foot{display:flex;gap:8px;padding:14px 18px;border-top:1px solid #EEF0F3;flex-wrap:wrap;}
+
+.sys-note{display:flex;align-items:center;gap:7px;font-size:11.5px;color:#5A7F93;padding-left:44px;margin-top:-12px;}
+.sys-note i{font-size:10px;color:#89C826;}
+
+/* thumbs */
+.msg-eval-row{display:flex;align-items:center;gap:4px;padding-left:2px;margin-top:2px;min-height:26px;opacity:0;transition:opacity .15s;}
+.msg-ai:hover .msg-eval-row{opacity:1;}
+.msg-ai.latest .msg-eval-row{opacity:1;}
+.msg-eval-btn{border:none;background:transparent;cursor:pointer;color:rgba(0,0,0,.18);font-size:14px;padding:4px 5px;border-radius:6px;transition:all .15s;display:flex;align-items:center;}
+.msg-eval-btn:hover{color:rgba(0,0,0,.4);background:rgba(0,0,0,.03);}
+.msg-eval-btn.active-up{color:#4caf50;}
+.msg-eval-btn.active-down{color:#EB6D47;}
+
+/* ── Ending ── */
+.wo-link{color:#21B8BF;text-decoration:underline;font-weight:600;cursor:pointer;letter-spacing:.4px;}
+.end-note{text-align:center;color:#9e9e9e;font-weight:700;font-size:15px;padding:6px 0;}
+
+/* ── Input bar ── */
+.input-bar{flex-shrink:0;padding:8px 20px;position:relative;}
+.text-bar{display:flex;align-items:center;min-height:52px;background:#f6f6f6;border:1px solid #e5e7eb;border-radius:26px;padding:4px 8px;width:100%;}
+.btn-add{width:36px;height:36px;min-width:36px;border-radius:50%;border:none;background:transparent;color:rgba(0,0,0,.45);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:2px;}
+.btn-add:hover{background:rgba(0,0,0,.05);}
+.text-input{flex:1;min-width:0;border:none;outline:none;background:transparent;font-family:'Open Sans',sans-serif;font-size:14px;color:#343434;padding:8px;line-height:20px;caret-color:#21B8BF;}
+.text-input::placeholder{color:rgba(0,0,0,.3);}
+.btn-mic,.btn-wave,.btn-send{width:34px;height:34px;min-width:34px;border-radius:50%;border:none;background:transparent;color:rgba(0,0,0,.3);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:2px;}
+.btn-mic:hover,.btn-wave:hover{background:rgba(0,0,0,.04);}
+.tw-bars{display:flex;align-items:center;gap:2px;}
+.tw-bar{width:2px;border-radius:1px;background:rgba(0,0,0,.3);}
+.tw-bar:nth-child(1){height:8px;}.tw-bar:nth-child(2){height:13px;}.tw-bar:nth-child(3){height:5px;}
+.btn-send{display:none;font-size:16px;}
+.btn-send.active{display:flex;color:#343434;}
+.disclaimer{display:flex;align-items:center;justify-content:space-between;padding:4px 20px 10px;}
+.disclaimer-text{font-size:11px;color:#9e9e9e;line-height:16px;flex:1;}
+.disclaimer-id{display:flex;align-items:center;gap:4px;font-size:11px;color:rgba(0,0,0,.4);font-family:'DM Mono',monospace;white-space:nowrap;margin-left:12px;}
+.thinking{background:rgba(0,0,0,.04);border-radius:14px;padding:12px 18px;box-shadow:0 4px 9px rgba(0,0,0,.2);font-size:14px;line-height:26px;color:rgba(0,0,0,.35);font-style:italic;}
+.thinking-dots span{animation:dot-fade 1.4s infinite;opacity:0;}
+.thinking-dots span:nth-child(2){animation-delay:.3s;}
+.thinking-dots span:nth-child(3){animation-delay:.6s;}
+@keyframes dot-fade{0%,100%{opacity:0;}30%,70%{opacity:1;}}
+
+/* toast */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-60px);background:#343434;color:#fff;font-family:'Roboto',sans-serif;font-size:14px;padding:12px 24px;z-index:9999;box-shadow:0 2px 2px 0 rgba(0,0,0,.14),0 1px 5px 0 rgba(0,0,0,.12);opacity:0;transition:all .3s ease;pointer-events:none;border-radius:4px;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── Non-production dev toggle ── */
+.dev-bar{position:fixed;left:16px;bottom:16px;z-index:500;background:#2B2B33;color:#EDEDF0;border-radius:12px;padding:12px 14px;box-shadow:0 8px 24px rgba(0,0,0,.28);width:290px;font-family:'Inter',sans-serif;}
+.dev-head{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.4px;color:#B7B7C4;text-transform:uppercase;margin-bottom:10px;}
+.dev-head i{color:#F0A020;}
+.dev-flag{font-family:'DM Mono',monospace;font-size:10px;color:#8A8A99;background:#3A3A44;border-radius:4px;padding:1px 5px;margin-left:auto;text-transform:none;letter-spacing:0;}
+.dev-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;}
+.dev-toggle-label{font-size:13px;color:#EDEDF0;}
+.dev-toggle-sub{font-size:11px;color:#9A9AA8;margin-top:2px;line-height:15px;}
+.switch{position:relative;width:42px;height:24px;flex-shrink:0;}
+.switch input{opacity:0;width:0;height:0;}
+.slider{position:absolute;inset:0;background:#55555F;border-radius:24px;transition:.2s;}
+.slider::before{content:'';position:absolute;height:18px;width:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;}
+.switch input:checked+.slider{background:#21B8BF;}
+.switch input:checked+.slider::before{transform:translateX(18px);}
+.dev-note{font-size:10.5px;color:#7C7C8A;margin-top:10px;line-height:15px;border-top:1px solid #3A3A44;padding-top:9px;}
+.dev-seg-wrap{margin-top:12px;border-top:1px solid #3A3A44;padding-top:11px;}
+.dev-seg{display:flex;background:#3A3A44;border-radius:8px;padding:3px;gap:3px;}
+.dev-seg-btn{flex:1;border:none;background:transparent;color:#B7B7C4;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;padding:7px 0;border-radius:6px;cursor:pointer;transition:.15s;}
+.dev-seg-btn.active{background:#21B8BF;color:#fff;}
+.dev-seg-btn:not(.active):hover{color:#EDEDF0;}
+.dev-min{position:fixed;left:16px;bottom:16px;z-index:500;width:40px;height:40px;border-radius:50%;background:#2B2B33;color:#F0A020;border:none;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.28);display:none;align-items:center;justify-content:center;font-size:15px;}
+.dev-collapse{position:absolute;top:10px;right:12px;border:none;background:transparent;color:#8A8A99;cursor:pointer;font-size:12px;}
+.dev-collapse:hover{color:#EDEDF0;}
+</style>
+</head>
+<body>
+<div class="toast" id="toast">Feedback submitted</div>
+
+<div class="page">
+<div class="chat-panel">
+  <div class="sub-header">
+    <button class="new-chat-btn"><i class="far fa-comment-dots"></i> New Chat</button>
+    <span class="wo-title" id="woTitle">Leak under the sink</span>
+    <div class="status-group">
+      <span class="step-label" id="stepLabel">Collecting Work Order Details</span>
+      <div class="step-dot"></div>
+    </div>
+  </div>
+
+  <div class="messages" id="messages"></div>
+
+  <div class="input-bar">
+    <div class="text-bar">
+      <button class="btn-add" title="Add"><i class="fas fa-plus"></i></button>
+      <input type="text" class="text-input" id="textInput" placeholder="Describe your issue..." autocomplete="off" />
+      <button class="btn-mic" title="Mic"><i class="fas fa-microphone"></i></button>
+      <button class="btn-wave" title="Voice"><div class="tw-bars"><div class="tw-bar"></div><div class="tw-bar"></div><div class="tw-bar"></div></div></button>
+      <button class="btn-send" id="btnSend" title="Send"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+  <div class="disclaimer">
+    <span class="disclaimer-text">AI is helping fill out details to enrich your work order. Verify details before submitting.</span>
+    <span class="disclaimer-id">Support ID: 7f1a2…</span>
+  </div>
+</div>
+
+<!-- Form panel -->
+<div class="form-panel">
+  <div class="form-header">
+    <div class="form-header-top">
+      <span class="form-title">Work Order</span>
+      <button class="form-menu-btn"><i class="fas fa-bars"></i></button>
+    </div>
+    <a class="form-link" href="#"><span>Go to standard form</span> <i class="fas fa-external-link-alt"></i></a>
+  </div>
+  <div class="form-scroll">
+    <div class="form-fields">
+      <div class="field"><label class="field-label">Client*</label><div class="field-input"><input type="text" value="Emser Tile" /><i class="fas fa-chevron-down chevron"></i></div></div>
+      <div class="field"><label class="field-label">Store*</label><div class="field-input" id="f-store"><input type="text" placeholder="Select a store" readonly /><i class="fas fa-exclamation-triangle warn" id="warn-store"></i><i class="fas fa-chevron-down chevron"></i></div></div>
+      <div class="field"><label class="field-label">Description*</label><textarea class="field-textarea" id="f-desc" placeholder="Describe the issue"></textarea></div>
+      <div class="field"><label class="field-label">Category*</label><div class="field-input" id="f-cat"><input type="text" placeholder="Select a category" readonly /><i class="fas fa-exclamation-triangle warn" id="warn-cat"></i><i class="fas fa-chevron-down chevron"></i></div></div>
+      <div class="field"><label class="field-label">Priority*</label><div class="field-input" id="f-priority"><input type="text" placeholder="Select a priority" readonly /><i class="fas fa-chevron-down chevron"></i></div></div>
+    </div>
+  </div>
+  <div class="panel-footer"><button class="btn-submit" onclick="createWO()">CREATE WORK ORDER</button></div>
+</div>
+</div>
+
+<!-- Non-production dev toggle -->
+<div class="dev-bar" id="devBar">
+  <button class="dev-collapse" onclick="collapseDev()" title="Minimize"><i class="fas fa-minus"></i></button>
+  <div class="dev-head"><i class="fas fa-flask"></i> Non-production <span class="dev-flag">enable_woa_duplicate_check</span></div>
+  <label class="dev-toggle">
+    <div>
+      <div class="dev-toggle-label">Surface duplicates &amp; recalls</div>
+      <div class="dev-toggle-sub">When on, the store/category check runs and shows matches.</div>
+    </div>
+    <span class="switch"><input type="checkbox" id="devToggle" checked onchange="onToggle()"><span class="slider"></span></span>
+  </label>
+  <div class="dev-seg-wrap">
+    <div class="dev-toggle-label" style="margin-bottom:6px;">Layout</div>
+    <div class="dev-seg">
+      <button id="seg-card" class="dev-seg-btn active" onclick="setLayout('card')">Card</button>
+      <button id="seg-table" class="dev-seg-btn" onclick="setLayout('table')">Table</button>
+    </div>
+  </div>
+  <div class="dev-note">Dev-only switches. In production the flag is a per-permission-group capability; layout is a build-time design choice, not a user control.</div>
+</div>
+<button class="dev-min" id="devMin" onclick="expandDev()"><i class="fas fa-flask"></i></button>
+
+<script>
+/* ── Config (parity with standard screen) ── */
+const RECALL_WINDOW_DAYS=90;   // standard screen hardcode; inherited
+const MAX_PER_SET=3;           // chat cap; standard grid is unbounded
+let featureOn=true;            // mirrors enable_woa_duplicate_check
+let layout='card';             // 'card' | 'table' — dev-only view switch
+const FEXA_SVG='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 555 555" width="28" height="28"><path d="M224,407.52c-32.39,32.39-79.2,44.61-121.68,45.98,1.37-42.55,13.59-89.36,45.98-121.68,32.39-32.39,79.2-44.61,121.68-45.98-1.37,42.55-13.59,89.35-45.98,121.68Z" fill="#27B2B5"/><path d="M452.74,453.5c-42.55-1.37-89.35-13.59-121.68-45.98-32.39-32.39-44.61-79.2-45.98-121.68,42.55,1.37,89.35,13.59,121.68,45.98,32.39,32.39,44.61,79.2,45.98,121.68" fill="#27B2B5"/><path d="M452.26,101.98c-1.37,42.48-13.59,89.08-45.84,121.34-32.25,32.26-78.99,44.47-121.34,45.84,1.37-42.48,13.59-89.08,45.84-121.34,32.26-32.26,78.99-44.47,121.33-45.84" fill="#9BF6F6"/><path d="M102.26,101.5c42.55,1.37,89.35,13.59,121.68,45.98,32.39,32.39,44.61,79.2,45.98,121.68-42.55-1.37-89.35-13.59-121.68-45.98-32.39-32.39-44.61-79.13-45.98-121.68" fill="#27B2B5"/></svg>';
+
+/* ── Mock rv1 result set (the endpoint that must be built) ── */
+/* Keyed by store|category. Each store/category has open + recall sets. */
+const DR_DATA={
+  '214|Plumbing':{
+    open:[
+      {id:'WO-83120',status:'Open',statusClass:'open',priority:'P2 - Moderate',age:'3 days',desc:'Water pooling under the mop-sink in the back stockroom; slow drip reported by closing staff.'},
+      {id:'WO-82994',status:'In Progress',statusClass:'progress',priority:'P3 - Low',age:'11 days',desc:'Employee restroom faucet drips continuously, handle hard to turn off.'}
+    ],
+    recall:[
+      {id:'WO-81640',status:'Recall',statusClass:'recall',priority:'P2 - Moderate',age:'27 days',desc:'Under-sink supply line replaced by vendor; leak has reportedly returned at the same joint.'}
+    ],
+    openTotal:2, recallTotal:1
+  }
+};
+function drKey(store,cat){
+  const s=(store.match(/\d+/)||[store])[0];
+  return s+'|'+cat.split('>').pop().trim();
+}
+
+const msgs=document.getElementById('messages');
+let store='', category='', drShownFor='', created=false;
+
+/* ── Message helpers ── */
+function elFromHTML(h){const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstElementChild;}
+function scrollToBottom(){msgs.scrollTop=msgs.scrollHeight;}
+function flash(el){el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');}
+function setField(id,val){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const target=(el.tagName==='INPUT'||el.tagName==='TEXTAREA')?el:el.querySelector('input,textarea');
+  if(!target)return;
+  target.value=val;
+  flash(el);
+}
+function evalRow(){return `<div class="msg-eval-row"><button class="msg-eval-btn" onclick="thumb(this,'up')"><i class="far fa-thumbs-up"></i></button><button class="msg-eval-btn" onclick="thumb(this,'down')"><i class="far fa-thumbs-down"></i></button></div>`;}
+function addUser(t){msgs.appendChild(elFromHTML(`<div class="msg msg-user"><div class="msg-user-bubble">${t}</div><div class="msg-user-icon">${FEXA_SVG}</div></div>`));scrollToBottom();}
+function addAI(html,extra,noEval){
+  const p=msgs.querySelector('.msg-ai.latest');if(p)p.classList.remove('latest');
+  msgs.appendChild(elFromHTML(`<div class="msg msg-ai latest"><div class="msg-ai-avatar"></div><div class="msg-ai-content"><div class="msg-ai-text">${html}</div>${extra||''}${noEval?'':evalRow()}</div></div>`));
+  scrollToBottom();
+}
+function addThinking(){msgs.appendChild(elFromHTML('<div class="msg msg-ai" id="thinking"><div class="msg-ai-avatar"></div><div class="msg-ai-content"><div class="thinking">Checking<span class="thinking-dots"><span>.</span><span>.</span><span>.</span></span></div></div></div>'));scrollToBottom();}
+function removeThinking(){const e=document.getElementById('thinking');if(e)e.remove();}
+function thumb(b,dir){
+  const row=b.parentElement,btns=row.querySelectorAll('.msg-eval-btn');
+  const on=b.classList.contains('active-'+dir);
+  btns.forEach(x=>{x.classList.remove('active-up','active-down');x.querySelector('i').className=x===btns[0]?'far fa-thumbs-up':'far fa-thumbs-down';});
+  if(!on){b.classList.add('active-'+dir);b.querySelector('i').className=(dir==='up'?'fas fa-thumbs-up':'fas fa-thumbs-down');showToast('Feedback submitted');}
+}
+
+/* ── The deterministic check (FIFI-458 core) ── */
+function maybeRunDuplicateCheck(){
+  // Gate: needs BOTH store and category. No store → no check, no error. (Open Q #3)
+  if(!store||!category)return;
+  // Feature flag gate (mirrors enable_woa_duplicate_check)
+  if(!featureOn)return;
+  // Fire once per store+category combination — not per field change. (Open Q #2)
+  const key=drKey(store,category);
+  if(drShownFor===key)return;
+  drShownFor=key;
+
+  const data=DR_DATA[key];
+  // Warning icons on the standard-screen fields, mirroring parity
+  document.getElementById('warn-cat').classList.toggle('show',!!data);
+  document.getElementById('warn-store').classList.toggle('show',!!data);
+  if(!data)return;               // No matches → surface nothing. (AC)
+
+  addThinking();
+  setTimeout(()=>{removeThinking();addAI(
+    `Before you go further — there ${plural(data.openTotal+data.recallTotal)} already at <strong>${store}</strong> for <strong>${category}</strong>. Worth a look so you don't open a duplicate.`,
+    (layout==='table'?dupTableHTML(data):dupCardHTML(data)),true);
+  },1200);
+}
+function plural(n){return n===1?'is 1 related work order':'are '+n+' related work orders';}
+
+/* ── Table variant renderer ── */
+function dupTableHTML(d){
+  const row=(r,recall)=>`<tr>
+    <td><span class="drt-wo" onclick="openWO('${r.id}')">${r.id}</span></td>
+    <td class="drt-desc">${r.desc}</td>
+    <td><span class="drt-badge ${r.statusClass}">${r.status}</span></td>
+    <td>${r.priority}</td>
+    <td class="drt-age">${r.age} old</td>
+  </tr>`;
+  const sect=(label,cls,n,total)=>`<tr class="drt-secthead"><td colspan="5"><span><span class="dr-tag ${cls}">${label}</span> ${n} of ${total}${cls==='recall'?` · last ${RECALL_WINDOW_DAYS} days`:''}</span></td></tr>`;
+  let body='';
+  if(d.open.length){
+    body+=sect('OPEN','dup',d.open.length,d.openTotal);
+    body+=d.open.slice(0,MAX_PER_SET).map(r=>row(r,false)).join('');
+  }
+  if(d.recall.length){
+    body+=sect('RECALL','recall',d.recall.length,d.recallTotal);
+    body+=d.recall.slice(0,MAX_PER_SET).map(r=>row(r,true)).join('');
+  }
+  const extra=(d.openTotal-Math.min(d.open.length,MAX_PER_SET))+(d.recallTotal-Math.min(d.recall.length,MAX_PER_SET));
+  const moreLabel=extra>0?`Read More Details (${extra} more)`:'Read More Details';
+  return `<div class="drt-card">
+    <div class="drt-banner"><i class="fas fa-exclamation-triangle"></i> Possible duplicate or repeat issue at this store</div>
+    <div class="drt-scroll"><table class="drt">
+      <thead><tr><th>WO #</th><th>Description</th><th>Status</th><th>Priority</th><th>Age</th></tr></thead>
+      <tbody>${body}</tbody>
+    </table></div>
+    <div class="drt-more" onclick="openStandard()">${moreLabel} <i class="fas fa-chevron-down"></i></div>
+    <div class="drt-foot"><button class="dr-act ghost" onclick="acknowledge(this)">None of these — keep going</button></div>
+  </div>`;
+}
+
+function dupCardHTML(d){
+  const openRows=d.open.slice(0,MAX_PER_SET).map(rowHTML).join('');
+  const recallRows=d.recall.slice(0,MAX_PER_SET).map(rowHTML).join('');
+  let html=`<div class="dr-card"><div class="dr-banner"><i class="fas fa-exclamation-triangle"></i> Possible duplicate or repeat issue at this store</div>`;
+  if(d.open.length){
+    html+=`<div class="dr-set"><div class="dr-set-head"><span class="dr-set-title"><span class="dr-tag dup">OPEN</span> Open work orders</span><span class="dr-count">${d.open.length} of ${d.openTotal}</span></div>${openRows}`;
+    if(d.openTotal>d.open.length)html+=`<div class="dr-more" onclick="openStandard()">${d.openTotal-d.open.length} more at this store — view all in the standard screen</div>`;
+    html+=`</div>`;
+  }
+  if(d.recall.length){
+    html+=`<div class="dr-set"><div class="dr-set-head"><span class="dr-set-title"><span class="dr-tag recall">RECALL</span> Recall work orders <span class="dr-count">· last ${RECALL_WINDOW_DAYS} days</span></span><span class="dr-count">${d.recall.length} of ${d.recallTotal}</span></div>${recallRows}`;
+    if(d.recallTotal>d.recall.length)html+=`<div class="dr-more" onclick="openStandard()">${d.recallTotal-d.recall.length} more — view all in the standard screen</div>`;
+    html+=`</div>`;
+  }
+  html+=`<div class="dr-foot">
+    <button class="dr-act ghost" onclick="acknowledge(this)">None of these — keep going</button>
+  </div></div>`;
+  return html;
+}
+function rowHTML(r){
+  return `<div class="dr-row">
+    <span class="dr-id" onclick="openWO('${r.id}')">${r.id}</span>
+    <div class="dr-body">
+      <div class="dr-desc">${r.desc}</div>
+      <div class="dr-meta">
+        <span class="dr-pill"><span class="dr-status ${r.statusClass}">${r.status}</span></span>
+        <span class="dr-pill dr-prio">${r.priority}</span>
+        <span class="dr-pill"><i class="far fa-clock"></i> ${r.age} old</span>
+      </div>
+    </div>
+    <button class="dr-open-btn" onclick="openWO('${r.id}')">Open</button>
+  </div>`;
+}
+function openWO(id){
+  addUser('Open '+id);
+  setTimeout(()=>addAI(`Opening <span class="wo-link" onclick="openStandard()">${id}</span> in a new tab — your draft here is saved, nothing's been discarded. If ${id} is the same issue, you can add a note there instead of creating a new work order.`,'',true),500);
+  showToast('Opening '+id+' (not wired in this prototype)');
+}
+function openStandard(){showToast('Would open the standard work order screen (not wired)');}
+function acknowledge(btn){
+  btn.closest('.dr-foot').innerHTML='<span style="font-size:11.5px;color:#5A7F93;padding:4px 2px;">Acknowledged — none of these match. You can finish the work order below.</span>';
+  addAI(`Understood — none of those are the same issue. I won't block you; let's finish this one. What's the priority?`);
+  setField('f-priority','P2 - Moderate');
+}
+
+/* ── Gathering flow ── */
+const textInput=document.getElementById('textInput'),btnSend=document.getElementById('btnSend');
+textInput.addEventListener('input',()=>btnSend.classList.toggle('active',textInput.value.trim().length>0));
+textInput.addEventListener('keydown',e=>{if(e.key==='Enter'&&textInput.value.trim()){e.preventDefault();send();}});
+btnSend.addEventListener('click',()=>{if(textInput.value.trim())send();});
+
+let step=0;
+function send(){
+  const t=textInput.value.trim();if(!t)return;
+  textInput.value='';btnSend.classList.remove('active');
+  addUser(t);
+  routeInput(t);
+}
+function routeInput(t){
+  const l=t.toLowerCase();
+  // capture store if mentioned
+  const sm=l.match(/store\s*(\d+)|\b(\d{2,4})\b/);
+  if(sm&&!store){ setStore('Store '+(sm[1]||sm[2])); return; }
+  if(step===0){
+    setField('f-desc','Reported leak under a sink — location and severity being gathered.');
+    addAI(`Sounds like a <strong>Plumbing</strong> issue — I've set the category. Which store is this at? (Type the store number.)`);
+    setCategory('Plumbing');
+    step=1;
+    return;
+  }
+  addAI(`Got it, I've noted that. Anything else before we finish?`);
+}
+function setStore(v){
+  store=v;setField('f-store',v);
+  addAI(`Set to <strong>${v}</strong>.`);
+  maybeRunDuplicateCheck();
+}
+function setCategory(v){
+  category=v;setField('f-cat',v);
+  maybeRunDuplicateCheck();
+}
+
+function createWO(){
+  if(created)return;created=true;
+  const n=83000+Math.floor(Math.random()*900);
+  addAI(`Work order # ${n} created. You can view it <span class="wo-link" onclick="openStandard()">here</span>.`,'',true);
+  setTimeout(()=>{msgs.appendChild(elFromHTML('<div class="msg end-note">Work order has been finalized, chat will now end</div>'));scrollToBottom();},700);
+  document.getElementById('stepLabel').textContent='Order Placed';
+  showToast('Work order created');
+}
+
+/* ── Dev toggle ── */
+function onToggle(){
+  featureOn=document.getElementById('devToggle').checked;
+  showToast(featureOn?'Duplicate check ON':'Duplicate check OFF');
+  // Re-evaluate current state so the effect is immediate & visible
+  if(!featureOn){
+    document.querySelectorAll('.dr-card, .drt-card').forEach(c=>c.closest('.msg').remove());
+    document.getElementById('warn-cat').classList.remove('show');
+    document.getElementById('warn-store').classList.remove('show');
+    drShownFor='';
+  }else{
+    drShownFor='';
+    maybeRunDuplicateCheck();
+  }
+}
+function setLayout(mode){
+  layout=mode;
+  document.getElementById('seg-card').classList.toggle('active',mode==='card');
+  document.getElementById('seg-table').classList.toggle('active',mode==='table');
+  // Re-render an already-surfaced result in the newly chosen layout
+  const existing=document.querySelector('.dr-card, .drt-card');
+  if(existing){
+    const data=DR_DATA[drShownFor];
+    if(data){
+      const fresh=elFromHTML(layout==='table'?dupTableHTML(data):dupCardHTML(data));
+      existing.replaceWith(fresh);
+    }
+  }
+  showToast('Layout: '+(mode==='table'?'Table':'Card'));
+}
+function collapseDev(){document.getElementById('devBar').style.display='none';document.getElementById('devMin').style.display='flex';}
+function expandDev(){document.getElementById('devBar').style.display='block';document.getElementById('devMin').style.display='none';}
+
+let toastTimer;
+function showToast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2400);}
+
+/* ── Seed: user opens with a plumbing issue, then we ask for the store ── */
+addUser('There\u2019s a leak under one of the sinks');
+setField('f-desc','Reported leak under a sink — location and severity being gathered.');
+setCategory('Plumbing');
+addAI(`Sounds like a <strong>Plumbing</strong> issue — I\u2019ve set the category. Which store is this at? You can type the store number.`,
+  `<div class="chips"><button class="chip" onclick="pickStore(this,'Store 214')">Store 214</button><button class="chip" onclick="pickStore(this,'Store 190')">Store 190</button></div>`);
+step=1;
+function pickStore(btn,v){btn.closest('.chips').classList.add('spent');addUser(v);setStore(v);}
+scrollToBottom();
+</script>
+</body>
+</html>
