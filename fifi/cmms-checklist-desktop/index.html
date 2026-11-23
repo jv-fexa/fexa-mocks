@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMMS Checklist (Desktop)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;family=Roboto+Slab:wght@700&amp;display=swap">
+<style>
+  html, body { margin: 0; height: 100%; background: #CFD8DC; }
+  body { display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  #frame { position: relative; overflow: hidden; box-shadow: 0 6px 24px rgba(0,0,0,.25); }
+  #stage { width: 1440px; height: 900px; transform-origin: 0 0; }
+</style>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+</head>
+<body>
+<div id="frame"><div id="stage"></div></div>
+<template id="dc-template">
+<div style="width: 1440px; height: 900px; position: relative; overflow: hidden; display: flex; background: #fff; font-family: Roboto, -apple-system, 'Segoe UI', Arial, sans-serif; color: #343434">
+
+<!-- Sidebar -->
+<nav aria-label="Main" style="width: 56px; flex-shrink: 0; background: #073B56; display: flex; flex-direction: column; align-items: center">
+  <div style="height: 60px; display: flex; align-items: center; justify-content: center"><svg width="30" height="30" viewBox="0 0 555 555" aria-hidden="true"><path d="M224,407.52c-32.39,32.39-79.2,44.61-121.68,45.98,1.37-42.55,13.59-89.36,45.98-121.68,32.39-32.39,79.2-44.61,121.68-45.98-1.37,42.55-13.59,89.35-45.98,121.68Z" fill="#27B2B5"></path><path d="M452.74,453.5c-42.55-1.37-89.35-13.59-121.68-45.98-32.39-32.39-44.61-79.2-45.98-121.68,42.55,1.37,89.35,13.59,121.68,45.98,32.39,32.39,44.61,79.2,45.98,121.68" fill="#27B2B5"></path><path d="M452.26,101.98c-1.37,42.48-13.59,89.08-45.84,121.34-32.25,32.26-78.99,44.47-121.34,45.84,1.37-42.48,13.59-89.08,45.84-121.34,32.26-32.26,78.99-44.47,121.33-45.84" fill="#9BF6F6"></path><path d="M102.26,101.5c42.55,1.37,89.35,13.59,121.68,45.98,32.39,32.39,44.61,79.2,45.98,121.68-42.55-1.37-89.35-13.59-121.68-45.98-32.39-32.39-44.61-79.13-45.98-121.68" fill="#27B2B5"></path></svg></div>
+  <button aria-label="Dashboard" style="width: 56px; height: 44px; background: none; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="20.2" height="18" viewBox="0 0 576 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M288 32C128.94 32 0 160.94 0 320c0 52.8 14.25 102.26 39.06 144.8 5.61 9.620 16.3 15.2 27.44 15.2h443c11.14 0 21.83-5.58 27.44-15.2C561.75 422.26 576 372.8 576 320c0-159.06-128.94-288-288-288zm0 64c14.71 0 26.58 10.13 30.32 23.65-1.11 2.26-2.64 4.23-3.45 6.670l-9.22 27.67c-5.13 3.49-10.97 6.01-17.64 6.01-17.67 0-32-14.33-32-32S270.33 96 288 96zM96 384c-17.67 0-32-14.33-32-32s14.33-32 32-32 32 14.33 32 32-14.33 32-32 32zm48-160c-17.67 0-32-14.33-32-32s14.33-32 32-32 32 14.33 32 32-14.33 32-32 32zm246.77-72.41l-61.33 184C343.13 347.33 352 364.54 352 384c0 11.72-3.38 22.55-8.88 32H232.88c-5.5-9.45-8.88-20.28-8.88-32 0-33.94 26.5-61.43 59.9-63.59l61.34-184.01c4.17-12.56 17.73-19.45 30.36-15.17 12.57 4.19 19.35 17.79 15.17 30.36zm14.66 57.2l15.52-46.55c3.47-1.29 7.13-2.23 11.05-2.23 17.67 0 32 14.33 32 32s-14.33 32-32 32c-11.38-.01-20.89-6.28-26.57-15.22zM480 384c-17.67 0-32-14.33-32-32s14.33-32 32-32 32 14.33 32 32-14.33 32-32 32z"></path></svg></button><button aria-label="FexaAI" style="width: 56px; height: 44px; background: none; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="22.5" height="18" viewBox="0 0 640 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M32,224H64V416H32A31.96166,31.96166,0,0,1,0,384V256A31.96166,31.96166,0,0,1,32,224Zm512-48V448a64.06328,64.06328,0,0,1-64,64H160a64.06328,64.06328,0,0,1-64-64V176a79.974,79.974,0,0,1,80-80H288V32a32,32,0,0,1,64,0V96H464A79.974,79.974,0,0,1,544,176ZM264,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,264,256Zm-8,128H192v32h64Zm96,0H288v32h64ZM456,256a40,40,0,1,0-40,40A39.997,39.997,0,0,0,456,256Zm-8,128H384v32h64ZM640,256V384a31.96166,31.96166,0,0,1-32,32H576V224h32A31.96166,31.96166,0,0,1,640,256Z"></path></svg></button><button aria-label="Work Orders" style="width: 56px; height: 44px; background: none; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="18.0" height="18" viewBox="0 0 512 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M507.73 109.1c-2.24-9.03-13.54-12.09-20.12-5.51l-74.36 74.36-67.88-11.31-11.31-67.88 74.36-74.36c6.62-6.62 3.43-17.9-5.66-20.16-47.38-11.74-99.55.91-136.58 37.93-39.64 39.64-50.55 97.1-34.05 147.2L18.74 402.76c-24.99 24.99-24.99 65.51 0 90.5 24.99 24.99 65.51 24.99 90.5 0l213.21-213.21c50.12 16.71 107.47 5.68 147.37-34.22 37.07-37.07 49.7-89.32 37.91-136.73zM64 472c-13.25 0-24-10.75-24-24 0-13.26 10.75-24 24-24s24 10.74 24 24c0 13.25-10.75 24-24 24z"></path></svg></button><button aria-label="Financials" style="width: 56px; height: 44px; background: none; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="20.0" height="16" viewBox="0 0 640 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M352 288h-16v-88c0-4.42-3.58-8-8-8h-13.58c-4.74 0-9.37 1.4-13.31 4.03l-15.33 10.22a7.994 7.994 0 0 0-2.22 11.09l8.88 13.31a7.994 7.994 0 0 0 11.09 2.22l.47-.31V288h-16c-4.42 0-8 3.58-8 8v16c0 4.42 3.58 8 8 8h64c4.42 0 8-3.58 8-8v-16c0-4.42-3.58-8-8-8zM608 64H32C14.33 64 0 78.33 0 96v320c0 17.67 14.33 32 32 32h576c17.67 0 32-14.33 32-32V96c0-17.67-14.33-32-32-32zM48 400v-64c35.35 0 64 28.65 64 64H48zm0-224v-64h64c0 35.35-28.65 64-64 64zm272 192c-53.02 0-96-50.15-96-112 0-61.86 42.98-112 96-112s96 50.14 96 112c0 61.87-43 112-96 112zm272 32h-64c0-35.35 28.65-64 64-64v64zm0-224c-35.35 0-64-28.65-64-64h64v64z"></path></svg></button><button aria-label="Assets" style="width: 56px; height: 44px; background: none; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="22.5" height="18" viewBox="0 0 640 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z"></path></svg></button><button aria-label="Facilities" style="width: 56px; height: 44px; background: none; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="16.6" height="19" viewBox="0 0 448 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M436 480h-20V24c0-13.255-10.745-24-24-24H56C42.745 0 32 10.745 32 24v456H12c-6.627 0-12 5.373-12 12v20h448v-20c0-6.627-5.373-12-12-12zM128 76c0-6.627 5.373-12 12-12h40c6.627 0 12 5.373 12 12v40c0 6.627-5.373 12-12 12h-40c-6.627 0-12-5.373-12-12V76zm0 96c0-6.627 5.373-12 12-12h40c6.627 0 12 5.373 12 12v40c0 6.627-5.373 12-12 12h-40c-6.627 0-12-5.373-12-12v-40zm52 148h-40c-6.627 0-12-5.373-12-12v-40c0-6.627 5.373-12 12-12h40c6.627 0 12 5.373 12 12v40c0 6.627-5.373 12-12 12zm76 160h-64v-84c0-6.627 5.373-12 12-12h40c6.627 0 12 5.373 12 12v84zm64-172c0 6.627-5.373 12-12 12h-40c-6.627 0-12-5.373-12-12v-40c0-6.627 5.373-12 12-12h40c6.627 0 12 5.373 12 12v40zm0-96c0 6.627-5.373 12-12 12h-40c-6.627 0-12-5.373-12-12v-40c0-6.627 5.373-12 12-12h40c6.627 0 12 5.373 12 12v40zm0-96c0 6.627-5.373 12-12 12h-40c-6.627 0-12-5.373-12-12V76c0-6.627 5.373-12 12-12h40c6.627 0 12 5.373 12 12v40z"></path></svg></button><button aria-label="Contacts" style="width: 56px; height: 44px; background: none; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="13.5" height="18" viewBox="0 0 384 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M336 0H48C21.5 0 0 21.5 0 48v416c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48V48c0-26.5-21.5-48-48-48zM192 128c35.3 0 64 28.7 64 64s-28.7 64-64 64-64-28.7-64-64 28.7-64 64-64zm112 236.8c0 10.6-10 19.2-22.4 19.2H102.4C90 384 80 375.4 80 364.8v-19.2c0-31.8 30.1-57.6 67.2-57.6h5c12.3 5.1 25.7 8 39.8 8s27.6-2.9 39.8-8h5c37.1 0 67.2 25.8 67.2 57.6v19.2z"></path></svg></button><button aria-label="History" style="width: 56px; height: 44px; background: none; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="18.0" height="18" viewBox="0 0 512 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200zm61.8-104.4l-84.9-61.7c-3.1-2.3-4.9-5.9-4.9-9.7V116c0-6.6 5.4-12 12-12h32c6.6 0 12 5.4 12 12v141.7l66.8 48.6c5.4 3.9 6.5 11.4 2.6 16.8L334.6 349c-3.9 5.3-11.4 6.5-16.8 2.6z"></path></svg></button>
+</nav>
+
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+  <!-- Top bar -->
+  <header style="height: 66px; flex-shrink: 0; background: #fff; display: flex; align-items: center; padding: 0 22px 0 18px; box-shadow: 0 2px 4px rgba(0,0,0,.12); position: relative; z-index: 2">
+    <div style="width: 433px; height: 36px; display: flex; align-items: center; gap: 12px; padding: 0 14px; border-radius: 3px; box-shadow: 0 1px 4px rgba(0,0,0,.22); box-sizing: border-box">
+      <svg width="15.0" height="15" viewBox="0 0 512 512" aria-hidden="true" style="fill: #757575; flex-shrink: 0;"><path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"></path></svg>
+      <input type="search" aria-label="Search" placeholder="Search..." style="flex: 1; min-width: 0; border: none; outline: none; background: transparent; font: inherit; font-size: 14px; color: #343434">
+      <svg width="10.3" height="15" viewBox="0 0 352 512" aria-hidden="true" style="fill: #E53935; flex-shrink: 0;"><path d="M176 352c53.02 0 96-42.98 96-96V96c0-53.02-42.98-96-96-96S80 42.98 80 96v160c0 53.02 42.98 96 96 96zm160-160h-16c-8.84 0-16 7.16-16 16v48c0 74.8-64.49 134.82-140.79 127.38C96.71 376.89 48 317.11 48 250.3V208c0-8.84-7.16-16-16-16H16c-8.84 0-16 7.16-16 16v40.16c0 89.64 63.97 169.55 152 181.69V464H96c-8.840 0-16 7.16-16 16v16c0 8.84 7.16 16 16 16h160c8.84 0 16-7.16 16-16v-16c0-8.84-7.16-16-16-16h-56v-33.77C285.71 418.47 352 344.9 352 256v-48c0-8.84-7.16-16-16-16z"></path></svg>
+    </div>
+    <span style="flex: 1"></span>
+    <span style="font-family: 'Roboto Slab', Georgia, serif; font-weight: 700; font-size: 30px; line-height: 1; color: #7AC143; letter-spacing: -.5px; margin-right: 32px">Fexa</span>
+    <button aria-label="Help" style="width: 42px; height: 42px; border-radius: 50%; background: #073B56; color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-right: 8px"><svg width="12.8" height="17" viewBox="0 0 384 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M202.021 0C122.202 0 70.503 32.703 29.914 91.026c-7.363 10.58-5.093 25.086 5.178 32.874l43.138 32.709c10.373 7.865 25.132 6.026 33.253-4.148 25.049-31.381 43.63-49.449 82.757-49.449 30.764 0 68.816 19.799 68.816 49.631 0 22.552-18.617 34.134-48.993 51.164-35.423 19.86-82.299 44.576-82.299 106.405V320c0 13.255 10.745 24 24 24h72.471c13.255 0 24-10.745 24-24v-5.773c0-42.86 125.268-44.645 125.268-160.627C377.504 66.256 286.902 0 202.021 0zM192 373.459c-38.196 0-69.271 31.075-69.271 69.271 0 38.195 31.075 69.27 69.271 69.27s69.271-31.075 69.271-69.271-31.075-69.27-69.271-69.27z"></path></svg></button>
+    <span style="width: 40px; height: 40px; border-radius: 50%; background: #FFC93B; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; letter-spacing: .3px">CP</span>
+    <span style="font-size: 14px; margin: 0 12px 0 6px">Cheryl Peterson</span>
+    <button aria-label="Menu" style="background: none; border: none; padding: 4px; cursor: pointer; display: flex; color: #343434"><svg width="15.8" height="18" viewBox="0 0 448 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"></path></svg></button>
+  </header>
+
+  <!-- Tabs -->
+  <div style="height: 55px; flex-shrink: 0; background: #E8ECEE; display: flex; align-items: flex-end; gap: 5px">
+    <div style="position: relative; width: 196px; height: 51px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500">Work Orders
+      <button aria-label="Close Work Orders tab" style="position: absolute; top: 6px; right: 6px; background: none; border: none; padding: 3px; cursor: pointer; display: flex; color: #757575"><svg width="8.9" height="13" viewBox="0 0 352 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.070c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg></button>
+    </div>
+    <div style="position: relative; width: 200px; height: 51px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; background: #FAFAFA; box-shadow: 0 0 6px rgba(0,0,0,.18); border-radius: 3px 3px 0 0; overflow: hidden">
+      <span style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #89C826"></span>Work Order # 682
+      <button aria-label="Close Work Order 682 tab" style="position: absolute; top: 8px; right: 6px; background: none; border: none; padding: 3px; cursor: pointer; display: flex; color: #757575"><svg width="8.9" height="13" viewBox="0 0 352 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.070c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg></button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+    <div style="height: 98px; flex-shrink: 0; position: relative">
+      <span style="position: absolute; top: 8px; right: 17px; height: 32px; padding: 0 15px; background: #21B8BF; color: #fff; font-size: 15px; font-weight: 500; display: flex; align-items: center; border-radius: 2px">NEW</span>
+      <button onClick="{{ logWork }}" style="position: absolute; top: 51px; left: 10px; height: 31px; padding: 0 14px 0 16px; display: flex; align-items: center; gap: 12px; background: #21B8BF; color: #fff; border: none; border-radius: 2px; font: inherit; font-size: 14px; font-weight: 500; letter-spacing: .3px; cursor: pointer">LOG WORK <svg width="8.1" height="13" viewBox="0 0 320 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></button>
+    </div>
+    <div style="flex: 1; min-height: 0; display: flex">
+      <div style="width: 310px; flex-shrink: 0; margin-left: 7px; align-self: flex-start; background: #DFE6E9; box-shadow: 2px 2px 5px rgba(0,0,0,.12)"><button onClick="{{ navOvGo }}" aria-current="{{ navOvCurrent }}" style="position: relative; z-index: {{ navOvZ }}; width: 100%; height: 38px; display: flex; align-items: center; padding: 0 16px; border: none; font: inherit; font-size: 15px; text-align: left; cursor: pointer; background: {{ navOvBg }}; color: {{ navOvColor }}; font-weight: {{ navOvWeight }}; box-shadow: {{ navOvShadow }}">Overview</button><button style="width: 100%; height: 38px; display: flex; align-items: center; padding: 0 16px; background: none; border: none; font: inherit; font-size: 15px; color: #343434; cursor: pointer; text-align: left">Assets</button><button onClick="{{ navSfGo }}" aria-current="{{ navSfCurrent }}" style="position: relative; z-index: {{ navSfZ }}; width: 100%; height: 38px; display: flex; align-items: center; padding: 0 16px; border: none; font: inherit; font-size: 15px; text-align: left; cursor: pointer; background: {{ navSfBg }}; color: {{ navSfColor }}; font-weight: {{ navSfWeight }}; box-shadow: {{ navSfShadow }}">Store Feedback</button><button style="width: 100%; height: 38px; display: flex; align-items: center; padding: 0 16px; background: none; border: none; font: inherit; font-size: 15px; color: #343434; cursor: pointer; text-align: left">Accounting</button><button style="width: 100%; height: 38px; display: flex; align-items: center; padding: 0 16px; background: none; border: none; font: inherit; font-size: 15px; color: #343434; cursor: pointer; text-align: left">Notes</button><button style="width: 100%; height: 38px; display: flex; align-items: center; padding: 0 16px; background: none; border: none; font: inherit; font-size: 15px; color: #343434; cursor: pointer; text-align: left">Files</button><button style="width: 100%; height: 38px; display: flex; align-items: center; padding: 0 16px; background: none; border: none; font: inherit; font-size: 15px; color: #343434; cursor: pointer; text-align: left">Nearby Work Orders</button><button style="width: 100%; height: 38px; display: flex; align-items: center; padding: 0 16px; background: none; border: none; font: inherit; font-size: 15px; color: #343434; cursor: pointer; text-align: left">Location Work Orders</button></div>
+
+      <main style="flex: 1; min-width: 0; margin: 0 8px 0 15px; overflow-y: auto; padding-bottom: 40px">
+        <sc-if value="{{ isOvView }}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{ onHold }}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="margin-bottom: 12px; padding: 12px 16px; background: #FFF6DC; border: 1px solid #F39C12; border-radius: 3px; display: flex; gap: 12px; align-items: flex-start; font-size: 14px; line-height: 1.45; color: #5C4400">
+          <svg width="16.9" height="15" viewBox="0 0 576 512" aria-hidden="true" style="fill: #9A6A00; flex-shrink: 0; margin-top: 2px"><path d="M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"></path></svg>
+          <span style="flex: 1">This work order can't move forward until its surveys are finished.</span>
+        </div>
+        </sc-if>
+        <div style="height: 48px; background: #F2F3F3; display: flex; align-items: center; padding: 0 16px; gap: 10px">
+  <span style="font-size: 18px; font-weight: 500; color: #6F6F6F">Work Order Details</span>
+  <span style="flex: 1"></span>
+  <button aria-label="Collapse Work Order Details" style="background: none; border: none; padding: 4px; cursor: pointer; display: flex; color: #21B8BF"><svg width="14.0" height="16" viewBox="0 0 448 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M240.971 130.524l194.343 194.343c9.373 9.373 9.373 24.569 0 33.941l-22.667 22.667c-9.357 9.357-24.522 9.375-33.901.04L224 227.495 69.255 381.516c-9.379 9.335-24.544 9.317-33.901-.04l-22.667-22.667c-9.373-9.373-9.373-24.569 0-33.941L207.03 130.525c9.372-9.373 24.568-9.373 33.941-.001z"></path></svg></button>
+</div>
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 9px; align-items: start; padding: 22px 6px 12px 17px">
+          <!-- left column -->
+          <div>
+            <span style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0">Work Order ID</span>
+            <span style="display: block; margin-top: 13px; font-size: 14px; line-height: 17px">682</span>
+            <div style="margin-top: 7px; border: 1px solid #ECEFF1; border-radius: 3px; padding: 8px 6px 6px; font-size: 13px; line-height: 18px">
+              <div style="display: flex; align-items: center; gap: 6px; font-weight: 700">Store Details <svg width="4.9" height="13" viewBox="0 0 192 512" aria-hidden="true" style="fill: #9AA8B0; flex-shrink: 0;"><path d="M20 424.229h20V279.771H20c-11.046 0-20-8.954-20-20V212c0-11.046 8.954-20 20-20h112c11.046 0 20 8.954 20 20v212.229h20c11.046 0 20 8.954 20 20V492c0 11.046-8.954 20-20 20H20c-11.046 0-20-8.954-20-20v-47.771c0-11.046 8.954-20 20-20zM96 0C56.235 0 24 32.235 24 72s32.235 72 72 72 72-32.235 72-72S135.764 0 96 0z"></path></svg></div>
+              <div style="display: flex; justify-content: space-between; gap: 12px">
+                <span><a href="#" style="color: #21B8BF; text-decoration: underline">Pitstop 0006</a> (Pitstop)</span>
+                <span style="display: flex; align-items: center; gap: 4px; white-space: nowrap">USD <svg width="16" height="11" viewBox="0 0 19 13" aria-hidden="true"><rect width="19" height="13" fill="#B22234"></rect><rect y="1" width="19" height="1" fill="#fff"></rect><rect y="3" width="19" height="1" fill="#fff"></rect><rect y="5" width="19" height="1" fill="#fff"></rect><rect y="7" width="19" height="1" fill="#fff"></rect><rect y="9" width="19" height="1" fill="#fff"></rect><rect y="11" width="19" height="1" fill="#fff"></rect><rect width="8" height="7" fill="#3C3B6E"></rect></svg></span>
+              </div>
+              <div>4800 S Hulen</div><div>Fort Worth, TX 76132</div><div>US</div><div>Eastern Time (US &amp; Canada)</div>
+            </div>
+            <span style="display: block; margin-top: 18px; font-size: 12px; line-height: 15px; color: #9AA8B0">Store Phone Number</span>
+            <span style="display: block; margin-top: 12px; font-size: 14px; line-height: 17px">+1 817 263 4010</span>
+            <span style="display: block; margin-top: 18px; font-size: 12px; line-height: 15px; color: #9AA8B0">Selected Problem</span>
+            <div style="margin-top: 17px"><div style="position: relative; padding: 40px 24px 3px 0; border-bottom: 1px solid #DDE3E6">
+  <span style="display: block; font-size: 14px; line-height: 19px; color: #9AA8B0">Area</span><span style="position: absolute; right: 2px; bottom: 7px; display: flex"><svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #616161; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></span>
+</div></div>
+            <div style="position: relative; padding: 40px 24px 3px 0; border-bottom: 1px solid #DDE3E6">
+  <span style="display: block; font-size: 14px; line-height: 19px; color: #9AA8B0">Asset</span><span style="position: absolute; right: 2px; bottom: 7px; display: flex"><svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #616161; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></span>
+</div>
+            <span style="display: block; margin-top: 35px; font-size: 12px; line-height: 15px; color: #9AA8B0">Description<span style="font-size: 9px; vertical-align: top">*</span></span>
+            <div style="margin-top: 11px; padding-bottom: 98px; border-bottom: 1px solid #DDE3E6; font-size: 14px; line-height: 17px">This is a test Work Order</div>
+            <button style="margin-top: 5px; display: inline-flex; align-items: center; gap: 8px; background: none; border: none; padding: 0; font: inherit; font-size: 15px; color: #21B8BF; text-decoration: underline; cursor: pointer">Show Instructions <svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #343434; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></button>
+          </div>
+          <!-- right column -->
+          <div>
+            <div style="position: relative; margin-top: 0px; padding: 0 24px 3px 0; border-bottom: 1px solid #DDE3E6">
+  <span style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0">Priority<span style="font-size: 9px; vertical-align: top">*</span></span>
+  <span style="display: block; margin-top: 11px; font-size: 14px; line-height: 17px; color: #343434">48 Hour</span><span style="position: absolute; right: 2px; bottom: 7px; display: flex"><svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #616161; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></span>
+</div>
+            <div style="position: relative; padding: 40px 24px 3px 0; border-bottom: 1px solid #DDE3E6">
+  <span style="display: block; font-size: 14px; line-height: 19px; color: #9AA8B0">Assignee</span><span style="position: absolute; right: 2px; bottom: 7px; display: flex"><svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #616161; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></span>
+</div>
+            <div style="position: relative; padding: 40px 24px 3px 0; border-bottom: 1px solid #DDE3E6">
+  <span style="display: block; font-size: 14px; line-height: 19px; color: #9AA8B0">Lead Technician</span><span style="position: absolute; right: 2px; bottom: 7px; display: flex"><svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #616161; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></span>
+</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; margin-top: 11px">
+              <div><span style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0">Created Date</span><span style="display: block; margin-top: 10px; font-size: 14px; line-height: 17px">09/05/25 09:34 P.M.</span></div>
+              <div><span style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0">Created By</span><span style="display: block; margin-top: 10px; font-size: 14px; line-height: 17px">Doris Gutierrez via API</span></div>
+            </div>
+            <div style="margin-top: 15px">
+  <span style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 12px">ETA</span>
+  <div style="display: flex; gap: 13px; align-items: flex-end">
+    <div style="flex: 3; min-width: 0; position: relative; padding: 0 24px 3px 0; border-bottom: 1px solid #DDE3E6"><span style="display: block; font-size: 14px; line-height: 17px; color: #343434; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">09/07/2025</span><span style="position: absolute; right: 2px; bottom: 5px; display: flex"><svg width="13.1" height="15" viewBox="0 0 448 512" aria-hidden="true" style="fill: #757575; flex-shrink: 0;"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"></path></svg></span></div>
+    <div style="flex: 1; min-width: 0; position: relative; padding: 0 0px 3px 0; border-bottom: 1px solid #DDE3E6"><span style="display: block; font-size: 14px; line-height: 17px; color: #343434; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">9</span></div>
+    <div style="flex: 1; min-width: 0; position: relative; padding: 0 0px 3px 0; border-bottom: 1px solid #DDE3E6"><span style="display: block; font-size: 14px; line-height: 17px; color: #343434; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">34</span></div>
+    <div style="flex: 1; min-width: 0; position: relative; padding: 0 24px 3px 0; border-bottom: 1px solid #DDE3E6"><span style="display: block; font-size: 14px; line-height: 17px; color: #343434; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">PM</span><span style="position: absolute; right: 2px; bottom: 7px; display: flex"><svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #616161; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></span></div>
+  </div>
+</div>
+            <div style="margin-top: 15px">
+  <span style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 12px">Date Completed</span>
+  <div style="display: flex; gap: 13px; align-items: flex-end">
+    <div style="flex: 3; min-width: 0; position: relative; padding: 0 24px 3px 0; border-bottom: 1px solid #DDE3E6"><span style="display: block; font-size: 14px; line-height: 17px; color: #BDC6CB; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Date</span><span style="position: absolute; right: 2px; bottom: 5px; display: flex"><svg width="13.1" height="15" viewBox="0 0 448 512" aria-hidden="true" style="fill: #757575; flex-shrink: 0;"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"></path></svg></span></div>
+    <div style="flex: 1; min-width: 0; position: relative; padding: 0 0px 3px 0; border-bottom: 1px solid #DDE3E6"><span style="display: block; font-size: 14px; line-height: 17px; color: #BDC6CB; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">HH</span></div>
+    <div style="flex: 1; min-width: 0; position: relative; padding: 0 0px 3px 0; border-bottom: 1px solid #DDE3E6"><span style="display: block; font-size: 14px; line-height: 17px; color: #BDC6CB; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">MM</span></div>
+    <div style="flex: 1; min-width: 0; position: relative; padding: 0 24px 3px 0; border-bottom: 1px solid #DDE3E6"><span style="display: block; font-size: 14px; line-height: 17px; color: #BDC6CB; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">AM/PM</span><span style="position: absolute; right: 2px; bottom: 7px; display: flex"><svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #616161; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></span></div>
+  </div>
+</div>
+            <div style="position: relative; padding: 40px 24px 3px 0; border-bottom: 1px solid #DDE3E6">
+  <span style="display: block; font-size: 14px; line-height: 19px; color: #9AA8B0">Division</span><span style="position: absolute; right: 2px; bottom: 7px; display: flex"><svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #616161; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></span>
+</div>
+            <div style="position: relative; padding: 40px 24px 3px 0; border-bottom: 1px solid #DDE3E6">
+  <span style="display: block; font-size: 14px; line-height: 19px; color: #9AA8B0">Department</span><span style="position: absolute; right: 2px; bottom: 7px; display: flex"><svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #616161; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></span>
+</div>
+            <div style="position: relative; padding: 40px 24px 3px 0; border-bottom: 1px solid #DDE3E6">
+  <span style="display: block; font-size: 14px; line-height: 19px; color: #9AA8B0">SM Cell #<span style="font-size: 9px; vertical-align: top">*</span></span>
+</div>
+            <div style="position: relative; padding: 40px 24px 3px 0; border-bottom: 1px solid #DDE3E6">
+  <span style="display: block; font-size: 14px; line-height: 19px; color: #9AA8B0">CF Req Demo1</span>
+</div>
+            <div style="position: relative; padding: 40px 24px 3px 0; border-bottom: 1px solid #DDE3E6">
+  <span style="display: block; font-size: 14px; line-height: 19px; color: #9AA8B0">CF wo2</span>
+</div>
+            <div style="position: relative; padding: 40px 24px 3px 0; border-bottom: 1px solid #DDE3E6">
+  <span style="display: block; font-size: 14px; line-height: 19px; color: #9AA8B0">Phone Number Test<span style="font-size: 9px; vertical-align: top">*</span></span>
+</div>
+          </div>
+        </div>
+
+        <div style="height: 48px; background: #F2F3F3; display: flex; align-items: center; padding: 0 16px; gap: 10px">
+  <span style="font-size: 18px; font-weight: 500; color: #6F6F6F">Service Assignments</span>
+  <span style="flex: 1"></span>
+  <button aria-label="Collapse Service Assignments" style="background: none; border: none; padding: 4px; cursor: pointer; display: flex; color: #21B8BF"><svg width="14.0" height="16" viewBox="0 0 448 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M240.971 130.524l194.343 194.343c9.373 9.373 9.373 24.569 0 33.941l-22.667 22.667c-9.357 9.357-24.522 9.375-33.901.04L224 227.495 69.255 381.516c-9.379 9.335-24.544 9.317-33.901-.04l-22.667-22.667c-9.373-9.373-9.373-24.569 0-33.941L207.03 130.525c9.372-9.373 24.568-9.373 33.941-.001z"></path></svg></button>
+</div>
+        <div style="overflow-x: auto"><div style="display: grid; grid-template-columns: 56px repeat(6, minmax(0, 1fr)) minmax(0, .55fr) repeat(5, minmax(0, 1fr)) 34px; height: 40px; background: #F7F8F8; border-bottom: 2px solid #E0E4E6; font-size: 13px; color: #343434"><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">ID</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Provider</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Facility</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Category</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Priority</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Class</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">NTE</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">NTE (Facility Currency)</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Business Req Met</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Response Deadline</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Arrival Deadline</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Completion Deadline</span></div><div></div></div>
+<div style="display: grid; grid-template-columns: 56px repeat(6, minmax(0, 1fr)) minmax(0, .55fr) repeat(5, minmax(0, 1fr)) 34px; height: 42px; border-bottom: 1px solid #E8ECEE; font-size: 13px; color: #343434"><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">737</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 8px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Cheryl Peterson</span><svg width="5.2" height="14" viewBox="0 0 192 512" aria-hidden="true" style="fill: #9AA8B0; flex-shrink: 0;"><path d="M20 424.229h20V279.771H20c-11.046 0-20-8.954-20-20V212c0-11.046 8.954-20 20-20h112c11.046 0 20 8.954 20 20v212.229h20c11.046 0 20 8.954 20 20V492c0 11.046-8.954 20-20 20H20c-11.046 0-20-8.954-20-20v-47.771c0-11.046 8.954-20 20-20zM96 0C56.235 0 24 32.235 24 72s32.235 72 72 72 72-32.235 72-72S135.764 0 96 0z"></path></svg></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Pitstop 0006</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Awning | Cleaning</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">48 Hour</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Reactive Maintenance</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">$1,016.00</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">$1,016.00 (USD)</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 8px"><span style="color: #4CAF50; font-weight: 700">Yes</span><svg width="5.2" height="14" viewBox="0 0 192 512" aria-hidden="true" style="fill: #9AA8B0; flex-shrink: 0;"><path d="M20 424.229h20V279.771H20c-11.046 0-20-8.954-20-20V212c0-11.046 8.954-20 20-20h112c11.046 0 20 8.954 20 20v212.229h20c11.046 0 20 8.954 20 20V492c0 11.046-8.954 20-20 20H20c-11.046 0-20-8.954-20-20v-47.771c0-11.046 8.954-20 20-20zM96 0C56.235 0 24 32.235 24 72s32.235 72 72 72 72-32.235 72-72S135.764 0 96 0z"></path></svg></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">9/5/2025, 5:34 PM</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">9/7/2025, 9:34 PM</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">9/8/2025, 9:34 PM</span></div><div style="display: flex; align-items: center; justify-content: center"><svg width="12.2" height="14" viewBox="0 0 448 512" aria-hidden="true" style="fill: #9E9E9E; flex-shrink: 0;"><path d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"></path></svg></div></div></div>
+        <div style="display: flex; justify-content: flex-end; padding: 10px 16px 0">
+          <span style="background: #6A4A0A; color: #fff; font-size: 14px; font-weight: 500; padding: 0 16px; height: 31px; display: inline-flex; align-items: center; border-radius: 2px">EXPIRED</span>
+        </div>
+        <div style="padding: 24px 18px 10px">
+          <span style="display: block; font-size: 12px; color: #9AA8B0">Assignment Scope</span>
+          <button style="margin-top: 6px; display: inline-flex; align-items: center; gap: 8px; background: none; border: none; padding: 0; font: inherit; font-size: 15px; color: #343434; cursor: pointer">Show Instructions <svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #343434; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></button>
+        </div>
+
+
+        <div data-visits="1">
+        <div style="height: 48px; background: #F2F3F3; display: flex; align-items: center; padding: 0 16px; gap: 10px">
+  <span style="font-size: 18px; font-weight: 500; color: #6F6F6F">Visits</span><span style="background: #F58D23; color: #fff; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700">{{ visitCount }}</span>
+  <span style="flex: 1"></span><button onClick="{{ openVisit }}" aria-label="Add visit" title="Add visit" style="background: none; border: none; padding: 2px; cursor: pointer; display: flex; color: #21B8BF; margin-right: 4px"><svg width="22.8" height="26" viewBox="0 0 448 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path></svg></button>
+  <button aria-label="Collapse Visits" style="background: none; border: none; padding: 4px; cursor: pointer; display: flex; color: #21B8BF"><svg width="14.0" height="16" viewBox="0 0 448 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M240.971 130.524l194.343 194.343c9.373 9.373 9.373 24.569 0 33.941l-22.667 22.667c-9.357 9.357-24.522 9.375-33.901.04L224 227.495 69.255 381.516c-9.379 9.335-24.544 9.317-33.901-.04l-22.667-22.667c-9.373-9.373-9.373-24.569 0-33.941L207.03 130.525c9.372-9.373 24.568-9.373 33.941-.001z"></path></svg></button>
+</div>
+        </div>
+        <div style="overflow-x: auto"><div style="display: grid; grid-template-columns: 56px repeat(6, minmax(0, 1fr)) minmax(0, 1.2fr); height: 40px; background: #F7F8F8; border-bottom: 2px solid #E0E4E6; font-size: 13px; color: #343434"><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">ID</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Category</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Visit Start Time</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Check In</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Check Out</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Time</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Summary</span></div><div style="padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Surveys</span><span style="position: relative; display: inline-flex"><button onClick="{{ toggleClTip }}" aria-label="About surveys" aria-describedby="cl-tip" title="This work order can't be completed until all its surveys are finished." style="width: 20px; height: 20px; padding: 0; background: none; border: none; display: flex; align-items: center; justify-content: center; color: #9AA8B0; cursor: pointer"><svg width="12" height="12" viewBox="0 0 512 512" aria-hidden="true" style="fill: currentColor"><path d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z"></path></svg></button><sc-if value="{{ clTipOpen }}" hint-placeholder-val="{{ false }}"><span id="cl-tip" role="tooltip" style="position: absolute; right: -6px; top: 26px; width: 230px; padding: 8px 10px; background: #343434; color: #fff; font-size: 12px; font-weight: 400; line-height: 1.45; border-radius: 3px; box-shadow: 0 2px 6px rgba(0,0,0,.25); white-space: normal; z-index: 12">This work order can't be completed until all its surveys are finished.</span></sc-if></span></div></div>
+<sc-for list="{{ visitRows }}" as="v" hint-placeholder-count="1">
+  <div>
+    <div style="display: grid; grid-template-columns: 56px repeat(6, minmax(0, 1fr)) minmax(0, 1.2fr); height: 41px; border-bottom: 1px solid #E8ECEE; font-size: 13px; color: #343434; background: {{ v.rowBg }}; transition: background .6s"><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ v.id }}</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ v.cat }}</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ v.start }}</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ v.checkin }}</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ v.checkout }}</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ v.time }}</span></div><div style="border-right: 1px solid #E8ECEE; padding: 0 12px; min-width: 0; display: flex; align-items: center; gap: 6px"><span style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ v.summary }}</span></div><div style="padding: 0 8px 0 12px; min-width: 0; display: flex; align-items: center; gap: 8px"><sc-if value="{{ v.hasCl }}" hint-placeholder-val="{{ true }}"><button onClick="{{ openSurveys }}" title="{{ todoTitle }}" style="background: none; border: none; padding: 0; font: inherit; font-size: 13px; font-weight: {{ todoWeight }}; color: {{ todoColor }}; text-decoration: underline; text-align: left; cursor: pointer; white-space: nowrap">{{ todoText }}</button></sc-if><sc-if value="{{ v.noCl }}" hint-placeholder-val="{{ false }}"><span style="color: #B0BEC5">—</span></sc-if></div></div>
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 10px 0">
+      <div style="position: relative">
+      <button onClick="{{ v.toggleWf }}" aria-haspopup="menu" aria-expanded="{{ v.wfExpanded }}" style="width: 130px; height: 32px; box-sizing: border-box; background: #21B8BF; color: #fff; border: none; border-radius: 2px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; font: inherit; font-size: 14px; font-weight: 500; letter-spacing: .3px; cursor: pointer">WORKFLOW <svg width="8.1" height="13" viewBox="0 0 320 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></button>
+        <sc-if value="{{ v.wfOpen }}" hint-placeholder-val="{{ false }}">
+        <div role="menu" aria-label="Workflow" style="position: absolute; left: 0; top: 36px; min-width: 190px; background: #fff; box-shadow: 0 3px 10px rgba(0,0,0,.28); padding: 4px 0; z-index: 15">
+          <button role="menuitem" onClick="{{ v.complete }}" style="display: block; width: 100%; height: 32px; padding: 0 14px; background: none; border: none; font: inherit; font-size: 14px; color: #343434; text-align: left; cursor: pointer">Complete work order</button>
+          <button role="menuitem" onClick="{{ v.toggleWf }}" style="display: block; width: 100%; height: 32px; padding: 0 14px; background: none; border: none; font: inherit; font-size: 14px; color: #343434; text-align: left; cursor: pointer">Request follow-up</button>
+        </div>
+        </sc-if>
+      </div>
+      <span style="background: {{ v.pillBg }}; color: #fff; font-size: 14px; font-weight: 500; padding: 0 16px; height: 31px; display: inline-flex; align-items: center; border-radius: 2px">{{ v.pill }}</span>
+    </div>
+    <div style="padding: 14px 16px 16px; font-size: 12px; color: #9AA8B0">Scope</div>
+  </div>
+</sc-for></div>
+        </sc-if>
+
+        <sc-if value="{{ isSfView }}" hint-placeholder-val="{{ false }}">
+        <div style="height: 48px; background: #F2F3F3; display: flex; align-items: center; padding: 0 16px; gap: 10px">
+          <span style="font-size: 18px; font-weight: 500; color: #6F6F6F">Store Feedback</span>
+        </div>
+        <div style="padding: 22px 17px 24px; max-width: 620px">
+          <sc-if value="{{ dfbIsDone }}" hint-placeholder-val="{{ false }}">
+          <div role="status" style="margin-bottom: 18px; display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #EEF8F8; border: 1px solid #CFEAEB; border-radius: 3px; font-size: 13px; color: #1F6F73">
+            <svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Feedback submitted. It can no longer be changed.
+          </div>
+          </sc-if>
+          <div id="dfb-rate" style="font-size: 12px; line-height: 15px; color: #9AA8B0">How was your visit to this store? <span style="color: #E24B4A">*</span></div>
+          <div role="group" aria-labelledby="dfb-rate" style="display: flex; gap: 6px; margin-top: 8px">
+            <sc-for list="{{ dfbStars }}" as="st" hint-placeholder-count="5">
+              <button onClick="{{ st.pick }}" aria-pressed="{{ st.pressed }}" aria-label="{{ st.label }}" style="width: 48px; height: 58px; padding: 0; background: none; border: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: {{ st.cursor }}">
+                <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true" style="fill: {{ st.fill }}; stroke: {{ st.stroke }}; stroke-width: 1.6; stroke-linejoin: round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"></polygon></svg>
+                <span style="font-size: 12px; color: {{ st.numColor }}">{{ st.n }}</span>
+              </button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ dfbRatingError }}" hint-placeholder-val="{{ false }}"><div role="alert" style="margin-top: 2px; font-size: 12px; color: #D32F2F">Select a rating to continue.</div></sc-if>
+
+          <div data-dfbcomment="1" style="margin-top: 22px">
+            <label for="dfb-comment" style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 8px">Comment<sc-if value="{{ dfbIsLow }}" hint-placeholder-val="{{ false }}"><span style="color: #E24B4A"> *</span></sc-if></label>
+            <sc-if value="{{ dfbIsEdit }}" hint-placeholder-val="{{ true }}">
+            <textarea id="dfb-comment" value="{{ dfbComment }}" onChange="{{ dfbOnComment }}" style="display: block; resize: none; height: 72px; width: 100%; border: none; border-bottom: 1px solid {{ dfbCommentLine }}; outline: none; background: transparent; font: inherit; font-size: 14px; line-height: 20px; color: #343434; padding: 0 0 5px; box-sizing: border-box"></textarea>
+            </sc-if>
+            <sc-if value="{{ dfbIsDone }}" hint-placeholder-val="{{ false }}">
+            <div style="min-height: 36px; padding-bottom: 6px; border-bottom: 1px solid #DDE3E6; font-size: 14px; color: {{ dfbDoneCommentColor }}">{{ dfbDoneComment }}</div>
+            </sc-if>
+            <sc-if value="{{ dfbShowNote }}" hint-placeholder-val="{{ false }}"><div style="margin-top: 6px; font-size: 12px; color: {{ dfbNoteColor }}">A comment is required for a rating of 2 or lower.</div></sc-if>
+          </div>
+
+          <sc-if value="{{ dfbIsEdit }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ dfbSubmit }}" aria-disabled="{{ dfbSubmitDisabled }}" style="margin-top: 22px; height: 32px; padding: 0 18px; border: none; border-radius: 2px; background: {{ dfbSubmitBg }}; color: #fff; font: inherit; font-size: 14px; font-weight: 500; letter-spacing: .4px; cursor: {{ dfbSubmitCursor }}">SUBMIT FEEDBACK</button>
+          </sc-if>
+        </div>
+        </sc-if>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay + side panel -->
+<div onClick="{{ closePanel }}" aria-hidden="true" style="position: absolute; inset: 0; background: rgba(0,0,0,.6); opacity: {{ overlayOpacity }}; pointer-events: {{ overlayEvents }}; transition: opacity .25s; z-index: 10"></div>
+<aside aria-label="Visit panel" style="position: absolute; top: 0; right: 0; bottom: 0; width: 452px; background: #fff; z-index: 11; display: flex; flex-direction: column; box-shadow: -2px 0 10px rgba(0,0,0,.25); transform: {{ panelX }}; transition: transform .28s ease">
+
+  <sc-if value="{{ isVisit }}" hint-placeholder-val="{{ false }}">
+  <section style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+    <header style="height: 49px; flex-shrink: 0; background: #F4F4F4; display: flex; align-items: center; gap: 10px; padding: 0 16px">
+      <h2 style="margin: 0; font-size: 19px; font-weight: 400; color: #616161">Visit</h2><svg width="17.0" height="17" viewBox="0 0 512 512" aria-hidden="true" style="fill: #263238; flex-shrink: 0;"><path d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z"></path></svg>
+      <span style="flex: 1"></span>
+    </header>
+    <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 4px 16px 20px">
+      <div style="margin-top: 20px"><span style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 12px">Provider<span style="font-size: 9px; vertical-align: top">*</span></span>
+  <div style="display: flex; align-items: center; gap: 10px; padding-bottom: 5px; border-bottom: 1px solid #DDE3E6"><span style="flex: 1; min-width: 0; font-size: 13px; line-height: 17px; color: #343434; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Cheryl Peterson (Pitstop) (Assignment # 737)</span><svg width="9.6" height="14" viewBox="0 0 352 512" aria-hidden="true" style="fill: #757575; flex-shrink: 0;"><path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.070c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg><svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #616161; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></div></div>
+      <div style="margin-top: 22px"><span style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 12px">Category<span style="font-size: 9px; vertical-align: top">*</span></span>
+  <div style="display: flex; align-items: center; gap: 10px; padding-bottom: 5px; border-bottom: 1px solid #DDE3E6"><span style="flex: 1; min-width: 0; font-size: 13px; line-height: 17px; color: #343434; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Awning &gt; Cleaning</span><svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #616161; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></div></div>
+      <div style="margin-top: 38px; border-bottom: 1px solid #DDE3E6">
+  <label style="display: block; font-size: 14px; line-height: 19px; color: #9AA8B0">Summary
+  <textarea aria-label="Summary" style="display: block; resize: none; height: 44px; width: 100%; margin-top: 6px; border: none; outline: none; background: transparent; font: inherit; font-size: 13px; line-height: 18px; color: #343434; padding: 0; box-sizing: border-box"></textarea></label>
+</div>
+      <div style="margin-top: 22px"><span style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 12px">Signature Required</span>
+  <button onClick="{{ toggle_sig }}" role="switch" aria-checked="{{ sigChecked }}" aria-label="Signature Required" style="width: 30px; height: 14px; border-radius: 7px; background: {{ sigTrack }}; border: none; position: relative; cursor: pointer; padding: 0; margin: 2px 0 2px 2px; display: block; transition: background .2s">
+    <span style="position: absolute; top: -2px; left: {{ sigLeft }}; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.3); transition: left .2s"></span>
+  </button></div>
+      <div style="margin-top: 20px"><span style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 12px">IVR Issue</span>
+  <button onClick="{{ toggle_ivr }}" role="switch" aria-checked="{{ ivrChecked }}" aria-label="IVR Issue" style="width: 30px; height: 14px; border-radius: 7px; background: {{ ivrTrack }}; border: none; position: relative; cursor: pointer; padding: 0; margin: 2px 0 2px 2px; display: block; transition: background .2s">
+    <span style="position: absolute; top: -2px; left: {{ ivrLeft }}; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.3); transition: left .2s"></span>
+  </button></div>
+      <div style="margin-top: 22px"><span style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 12px">Visit Start Time<span style="font-size: 9px; vertical-align: top">*</span></span>
+  <div style="display: flex; gap: 10px; align-items: flex-end">
+    <div style="flex: 136; min-width: 0; display: flex; align-items: center; gap: 8px; padding-bottom: 5px; border-bottom: 1px solid #DDE3E6"><span style="flex: 1; min-width: 0; font-size: 13px; line-height: 17px; color: #343434; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">09/07/2025</span><svg width="13.1" height="15" viewBox="0 0 448 512" aria-hidden="true" style="fill: #757575; flex-shrink: 0;"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"></path></svg></div>
+    <div style="flex: 128; min-width: 0; display: flex; align-items: center; gap: 8px; padding-bottom: 5px; border-bottom: 1px solid #DDE3E6"><span style="flex: 1; min-width: 0; font-size: 13px; line-height: 17px; color: #343434; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">9:34 AM</span><svg width="8.9" height="13" viewBox="0 0 352 512" aria-hidden="true" style="fill: #757575; flex-shrink: 0;"><path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.070c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg><svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #616161; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></div>
+    <div style="flex: 136; min-width: 0; display: flex; align-items: center; gap: 8px; padding-bottom: 5px; border-bottom: 1px solid #DDE3E6"><span style="flex: 1; min-width: 0; font-size: 13px; line-height: 17px; color: #343434; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Eastern Time (US &amp; Canada)</span><svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #616161; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></div>
+  </div></div>
+      <div style="margin-top: 20px"><span style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 12px">Visit End Time</span>
+  <div style="display: flex; gap: 10px; align-items: flex-end">
+    <div style="flex: 136; min-width: 0; display: flex; align-items: center; gap: 8px; padding-bottom: 5px; border-bottom: 1px solid #DDE3E6"><span style="flex: 1; min-width: 0; font-size: 13px; line-height: 17px; color: #BDC6CB; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Date</span><svg width="13.1" height="15" viewBox="0 0 448 512" aria-hidden="true" style="fill: #757575; flex-shrink: 0;"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"></path></svg></div>
+    <div style="flex: 128; min-width: 0; display: flex; align-items: center; gap: 8px; padding-bottom: 5px; border-bottom: 1px solid #DDE3E6"><span style="flex: 1; min-width: 0; font-size: 13px; line-height: 17px; color: #343434; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"></span><svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #616161; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></div>
+    <div style="flex: 136; min-width: 0; display: flex; align-items: center; gap: 8px; padding-bottom: 5px; border-bottom: 1px solid #DDE3E6"><span style="flex: 1; min-width: 0; font-size: 13px; line-height: 17px; color: #343434; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Eastern Time (US &amp; Canada)</span><svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #616161; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></div>
+  </div></div>
+      <div style="margin-top: 20px"><span style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 12px">Check In</span>
+  <div style="display: flex; gap: 10px; align-items: flex-end">
+    <div style="flex: 136; min-width: 0; display: flex; align-items: center; gap: 8px; padding-bottom: 5px; border-bottom: 1px solid #DDE3E6"><span style="flex: 1; min-width: 0; font-size: 13px; line-height: 17px; color: #BDC6CB; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Date</span><svg width="13.1" height="15" viewBox="0 0 448 512" aria-hidden="true" style="fill: #757575; flex-shrink: 0;"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"></path></svg></div>
+    <div style="flex: 128; min-width: 0; display: flex; align-items: center; gap: 8px; padding-bottom: 5px; border-bottom: 1px solid #DDE3E6"><span style="flex: 1; min-width: 0; font-size: 13px; line-height: 17px; color: #343434; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"></span><svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #616161; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></div>
+    <div style="flex: 136; min-width: 0; display: flex; align-items: center; gap: 8px; padding-bottom: 5px; border-bottom: 1px solid #DDE3E6"><span style="flex: 1; min-width: 0; font-size: 13px; line-height: 17px; color: #343434; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Eastern Time (US &amp; Canada)</span><svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #616161; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></div>
+  </div></div>
+      <div style="margin-top: 20px"><span style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 12px">Check Out</span>
+  <button onClick="{{ coTap }}" aria-label="{{ coAria }}" style="width: 100%; display: flex; gap: 10px; align-items: flex-end; background: none; border: none; padding: 0; font: inherit; cursor: pointer; text-align: left">
+    <span style="flex: 136; min-width: 0; display: flex; align-items: center; gap: 8px; padding-bottom: 5px; border-bottom: 1px solid #DDE3E6"><span style="flex: 1; min-width: 0; font-size: 13px; line-height: 17px; color: {{ coColor }}; white-space: nowrap">{{ coDate }}</span><svg width="13.1" height="15" viewBox="0 0 448 512" aria-hidden="true" style="fill: #757575; flex-shrink: 0;"><path d="M148 288h-40c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v40c0 6.6-5.4 12-12 12zm108-12v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 96v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm-96 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm192 0v-40c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v40c0 6.6 5.4 12 12 12h40c6.6 0 12-5.4 12-12zm96-260v352c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V112c0-26.5 21.5-48 48-48h48V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h128V12c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h48c26.5 0 48 21.5 48 48zm-48 346V160H48v298c0 3.3 2.7 6 6 6h340c3.3 0 6-2.7 6-6z"></path></svg></span>
+    <span style="flex: 128; min-width: 0; display: flex; align-items: center; gap: 8px; padding-bottom: 5px; border-bottom: 1px solid #DDE3E6"><span style="flex: 1; min-width: 0; font-size: 13px; line-height: 17px; color: #343434; white-space: nowrap">{{ coTime }}</span><svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #616161; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></span>
+    <span style="flex: 136; min-width: 0; display: flex; align-items: center; gap: 8px; padding-bottom: 5px; border-bottom: 1px solid #DDE3E6"><span style="flex: 1; min-width: 0; font-size: 13px; line-height: 17px; color: #343434; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Eastern Time (US &amp; Canada)</span><svg width="7.5" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #616161; flex-shrink: 0;"><path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></span>
+  </button>
+  <div style="margin-top: 6px; font-size: 12px; color: #78909C">{{ coHint }}</div>
+</div>
+      <div style="margin-top: 20px"><span style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 12px">Number of Technicians<span style="font-size: 9px; vertical-align: top">*</span></span>
+  <div style="display: flex; align-items: center; gap: 10px; padding-bottom: 5px; border-bottom: 1px solid #DDE3E6"><span style="flex: 1; min-width: 0; font-size: 13px; line-height: 17px; color: #343434; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">1</span><svg width="9.6" height="14" viewBox="0 0 352 512" aria-hidden="true" style="fill: #757575; flex-shrink: 0;"><path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.070c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg></div></div>
+      <div style="margin-top: 38px; border-bottom: 1px solid #DDE3E6">
+  <label style="display: block; font-size: 14px; line-height: 19px; color: #9AA8B0">Scope
+  <textarea aria-label="Scope" style="display: block; resize: none; height: 44px; width: 100%; margin-top: 6px; border: none; outline: none; background: transparent; font: inherit; font-size: 13px; line-height: 18px; color: #343434; padding: 0; box-sizing: border-box"></textarea></label>
+</div>
+    </div>
+    <footer style="flex-shrink: 0; padding: 2px; display: flex; flex-direction: column; gap: 5px">
+      <button onClick="{{ saveVisit }}" style="width: 100%; height: 32px; border: none; border-radius: 2px; background: #21B8BF; color: #fff; font: inherit; font-size: 14px; font-weight: 500; letter-spacing: .4px; cursor: pointer">SAVE</button>
+      <button onClick="{{ closePanel }}" style="width: 100%; height: 32px; border: none; border-radius: 2px; background: #E5553F; color: #fff; font: inherit; font-size: 14px; font-weight: 500; letter-spacing: .4px; cursor: pointer">CANCEL</button>
+    </footer>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ isList }}" hint-placeholder-val="{{ false }}">
+  <section style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+    <header style="height: 49px; flex-shrink: 0; background: #F4F4F4; display: flex; align-items: center; gap: 10px; padding: 0 16px">
+      <h2 style="margin: 0; font-size: 19px; font-weight: 400; color: #616161">Surveys</h2>
+      <span style="flex: 1"></span>
+      <span style="font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 12px; color: {{ listChipColor }}; background: {{ listChipBg }}; border: 1px solid {{ listChipBorder }}">{{ listChip }}</span>
+    </header>
+    <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 0 16px 20px">
+      <div style="padding: 16px 0 14px; border-bottom: 1px solid #EEF1F2">
+        <div style="font-size: 15px; font-weight: 500; color: #073B56">Visit {{ lastVisitId }}</div>
+        <div style="font-size: 12px; color: #9AA8B0; margin-top: 3px">WO 682 · Pitstop 0006 · Assignment # 737 · Visit 09/07/2025</div>
+        <div style="font-size: 13px; color: #607D8B; margin-top: 10px; line-height: 1.5">Finish every survey before you check out. Pick one to start.</div>
+      </div>
+      <sc-for list="{{ surveyRows }}" as="sv" hint-placeholder-count="3">
+        <button onClick="{{ sv.open }}" style="width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 4px; background: #fff; border: none; border-bottom: 1px solid #EEF1F2; font: inherit; text-align: left; cursor: pointer">
+          <span style="width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; background: {{ sv.iconBg }}; color: {{ sv.iconColor }}">
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; display: {{ sv.clipIcon }}"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1"></rect></svg>
+            <svg width="14" height="14" viewBox="0 0 512 512" aria-hidden="true" style="fill: currentColor; display: {{ sv.doneIcon }}"><path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path></svg>
+          </span>
+          <span style="flex: 1; min-width: 0">
+            <span style="display: block; font-size: 14px; font-weight: 500; color: #343434">{{ sv.name }}</span>
+            <span style="display: block; font-size: 12px; color: #78909C; margin-top: 2px">{{ sv.meta }}</span>
+          </span>
+          <span style="flex-shrink: 0; font-size: 12px; font-weight: 500; padding: 2px 9px; border-radius: 11px; color: {{ sv.stColor }}; background: {{ sv.stBg }}">{{ sv.stText }}</span>
+          <svg width="7" height="12" viewBox="0 0 320 512" aria-hidden="true" style="fill: #B0BEC5; flex-shrink: 0"><path d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"></path></svg>
+        </button>
+      </sc-for>
+    </div>
+    <footer style="flex-shrink: 0; padding: 2px; display: flex; flex-direction: column; gap: 5px">
+      <button onClick="{{ closePanel }}" style="width: 100%; height: 32px; border: 1px solid #21B8BF; border-radius: 2px; background: #fff; color: #189DA3; font: inherit; font-size: 14px; font-weight: 500; letter-spacing: .4px; cursor: pointer; box-sizing: border-box">CLOSE</button>
+    </footer>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ isCheck }}" hint-placeholder-val="{{ false }}">
+  <section style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+    <header style="height: 49px; flex-shrink: 0; background: #F4F4F4; display: flex; align-items: center; gap: 10px; padding: 0 16px">
+      <button onClick="{{ backToList }}" aria-label="Back to surveys" style="background: none; border: none; padding: 4px; margin-left: -6px; cursor: pointer; display: flex; color: #616161"><svg width="8.8" height="14" viewBox="0 0 320 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M34.52 239.03L228.87 44.69c9.37-9.37 24.57-9.37 33.94 0l22.67 22.67c9.36 9.36 9.37 24.52.04 33.9L131.49 256l154.02 154.75c9.34 9.38 9.32 24.54-.04 33.9l-22.67 22.67c-9.37 9.37-24.57 9.37-33.94 0L34.52 272.97c-9.37-9.37-9.37-24.57 0-33.94z"></path></svg></button>
+      <h2 style="margin: 0; font-size: 19px; font-weight: 400; color: #616161">Survey</h2>
+      <span style="flex: 1"></span>
+      <span style="font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 12px; color: {{ chipColor }}; background: {{ chipBg }}; border: 1px solid {{ chipBorder }}">{{ chipText }}</span>
+    </header>
+    <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 0 16px 20px">
+      <div style="padding: 16px 0 14px; border-bottom: 1px solid #EEF1F2">
+  <div style="font-size: 15px; font-weight: 500; color: #073B56">{{ actName }}</div>
+  <div style="font-size: 12px; color: #9AA8B0; margin-top: 3px">WO 682 · Pitstop 0006 · Assignment # 737 · Visit 09/07/2025</div>
+</div><sc-if value="{{ isS1 }}" hint-placeholder-val="{{ true }}"><div data-q="1" style="margin-top: 22px; border-radius: 4px; box-shadow: {{ fl1 }}; transition: box-shadow .2s">
+  <label for="dq1" style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 10px">1) Technician on site <span style="color: #E24B4A">*</span></label>
+  <input id="dq1" type="text" value="{{ q1 }}" onChange="{{ onQ1 }}" style="font: inherit; font-size: 13px; line-height: 17px; color: #343434; border: none; outline: none; background: transparent; width: 100%; padding: 0 0 5px; border-bottom: 1px solid #DDE3E6; display: block; box-sizing: border-box">
+</div><div data-q="2" style="margin-top: 22px; border-radius: 4px; box-shadow: {{ fl2 }}; transition: box-shadow .2s">
+  <div style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 10px">2) Site photo <span style="color: #E24B4A">*</span></div>
+  <sc-if value="{{ noPhoto }}" hint-placeholder-val="{{ true }}">
+    <label style="position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; height: 32px; font-size: 13px; font-weight: 500; color: #189DA3; border: 1px dashed #21B8BF; border-radius: 2px; cursor: pointer; box-sizing: border-box">
+      <input type="file" accept="image/*" aria-label="Add site photo" onChange="{{ onPhoto }}" style="position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden"><svg width="13.0" height="13" viewBox="0 0 512 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M512 144v288c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V144c0-26.5 21.5-48 48-48h88l12.3-32.9c7-18.7 24.9-31.1 44.9-31.1h125.5c20 0 37.9 12.4 44.9 31.1L376 96h88c26.5 0 48 21.5 48 48zM376 288c0-66.2-53.8-120-120-120s-120 53.8-120 120 53.8 120 120 120 120-53.8 120-120zm-32 0c0 48.5-39.5 88-88 88s-88-39.5-88-88 39.5-88 88-88 88 39.5 88 88z"></path></svg> ADD PHOTO
+    </label>
+  </sc-if>
+  <sc-if value="{{ hasPhoto }}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; align-items: center; gap: 10px; height: 32px; padding: 0 10px; background: #EEF8F8; border: 1px solid #CFEAEB; border-radius: 2px; box-sizing: border-box">
+      <svg width="14.0" height="14" viewBox="0 0 512 512" aria-hidden="true" style="fill: #189DA3; flex-shrink: 0;"><path d="M464 64H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm-6 336H54a6 6 0 0 1-6-6V118a6 6 0 0 1 6-6h404a6 6 0 0 1 6 6v276a6 6 0 0 1-6 6zM128 152c-22.091 0-40 17.909-40 40s17.909 40 40 40 40-17.909 40-40-17.909-40-40-40zM96 352h320v-80l-87.515-87.515c-4.686-4.686-12.284-4.686-16.971 0L192 304l-39.515-39.515c-4.686-4.686-12.284-4.686-16.971 0L96 304v48z"></path></svg><span style="flex: 1; min-width: 0; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ photoName }}</span><svg width="12.0" height="12" viewBox="0 0 512 512" aria-hidden="true" style="fill: #189DA3; flex-shrink: 0;"><path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path></svg>
+      <button onClick="{{ rmPhoto }}" aria-label="Remove photo" style="background: none; border: none; padding: 2px; cursor: pointer; display: flex; color: #90A4AE"><svg width="8.2" height="12" viewBox="0 0 352 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.070c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg></button>
+    </div>
+  </sc-if>
+</div><div data-q="3" style="margin-top: 22px; border-radius: 4px; box-shadow: {{ fl3 }}; transition: box-shadow .2s">
+  <div style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 10px">3) Awning is free of water damage <span style="color: #E24B4A">*</span></div>
+  <div role="group" aria-label="Awning is free of water damage" style="display: flex; gap: 8px">
+    <sc-for list="{{ q3opts }}" as="o" hint-placeholder-count="2">
+      <button onClick="{{ o.pick }}" aria-pressed="{{ o.pressed }}" style="flex: 1; height: 34px; display: flex; align-items: center; justify-content: center; gap: 7px; font: inherit; font-size: 13px; letter-spacing: .4px; background: {{ o.bg }}; color: {{ o.color }}; font-weight: {{ o.weight }}; border: 1px solid {{ o.border }}; border-radius: 2px; cursor: pointer"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; display: {{ o.pIcon }}"><polyline points="20 6 9 17 4 12"></polyline></svg><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; display: {{ o.fIcon }}"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>{{ o.label }}</button>
+    </sc-for>
+  </div>
+  <sc-if value="{{ q3Fail }}" hint-placeholder-val="{{ false }}">
+  <div style="margin-top: 14px">
+    <label for="dq3c" style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 8px">Describe the failure <span style="color: #E24B4A">*</span></label>
+    <textarea id="dq3c" value="{{ q3c }}" onChange="{{ onQ3c }}" placeholder="What did you find?" style="display: block; resize: none; height: 54px; width: 100%; border: none; border-bottom: 1px solid {{ q3cLine }}; outline: none; background: transparent; font: inherit; font-size: 13px; line-height: 18px; color: #343434; padding: 0 0 5px; box-sizing: border-box"></textarea>
+  </div>
+  </sc-if>
+</div><div data-q="4" style="margin-top: 22px; border-radius: 4px; transition: box-shadow .2s">
+  <label for="dq4" style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 10px">4) Date of last cleaning</label>
+  <input id="dq4" type="date" value="{{ q4 }}" onChange="{{ onQ4 }}" style="font: inherit; font-size: 13px; line-height: 17px; color: #343434; border: none; outline: none; background: transparent; width: 100%; padding: 0 0 5px; border-bottom: 1px solid #DDE3E6; display: block; box-sizing: border-box">
+</div><div data-q="5" style="margin-top: 22px; border-radius: 4px; box-shadow: {{ fl5 }}; transition: box-shadow .2s">
+  <label for="dq5" style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 10px">5) Overall condition, 1 to 5 <span style="color: #E24B4A">*</span></label>
+  <input id="dq5" type="number" min="1" max="5" placeholder="1 – 5" value="{{ q5 }}" onChange="{{ onQ5 }}" style="font: inherit; font-size: 13px; line-height: 17px; color: #343434; border: none; outline: none; background: transparent; width: 100%; padding: 0 0 5px; border-bottom: 1px solid #DDE3E6; display: block; box-sizing: border-box">
+</div><div data-q="6" style="margin-top: 22px; border-radius: 4px; box-shadow: {{ fl6 }}; transition: box-shadow .2s">
+  <div style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 10px">6) Cleaning solution used <span style="color: #E24B4A">*</span></div>
+  <div style="display: flex; flex-direction: column; gap: 6px">
+    <sc-for list="{{ q6opts }}" as="o" hint-placeholder-count="3">
+      <button onClick="{{ o.pick }}" aria-pressed="{{ o.pressed }}" style="display: flex; align-items: center; gap: 10px; width: 100%; height: 34px; padding: 0 12px; font: inherit; font-size: 13px; color: {{ o.color }}; font-weight: {{ o.weight }}; text-align: left; background: {{ o.bg }}; border: 1px solid {{ o.border }}; border-radius: 2px; cursor: pointer; box-sizing: border-box">
+        <span style="width: 14px; height: 14px; border: {{ o.dot }}; border-radius: 50%; background: #fff; flex-shrink: 0; box-sizing: border-box"></span>{{ o.label }}
+      </button>
+    </sc-for>
+  </div>
+</div><div data-q="7" style="margin-top: 22px; border-radius: 4px; transition: box-shadow .2s">
+  <label for="dq7" style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 10px">7) Additional notes</label>
+  <textarea id="dq7" value="{{ q7 }}" onChange="{{ onQ7 }}" style="display: block; resize: none; height: 54px; width: 100%; border: none; border-bottom: 1px solid #DDE3E6; outline: none; background: transparent; font: inherit; font-size: 13px; line-height: 18px; color: #343434; padding: 0 0 5px; box-sizing: border-box"></textarea>
+</div></sc-if><sc-if value="{{ isGeneric }}" hint-placeholder-val="{{ false }}">
+<sc-for list="{{ gQs }}" as="q" hint-placeholder-count="3">
+<div data-gq="{{ q.idx }}" style="margin-top: 22px; border-radius: 4px; box-shadow: {{ q.fl }}; transition: box-shadow .2s">
+  <div style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0; margin-bottom: 10px">{{ q.num }}) {{ q.label }} <span style="color: #E24B4A">*</span></div>
+  <div role="group" aria-label="{{ q.label }}" style="display: flex; gap: 8px">
+    <sc-for list="{{ q.opts }}" as="o" hint-placeholder-count="2">
+      <button onClick="{{ o.pick }}" aria-pressed="{{ o.pressed }}" style="flex: 1; height: 34px; display: flex; align-items: center; justify-content: center; font: inherit; font-size: 13px; letter-spacing: .4px; background: {{ o.bg }}; color: {{ o.color }}; font-weight: {{ o.weight }}; border: 1px solid {{ o.border }}; border-radius: 2px; cursor: pointer">{{ o.label }}</button>
+    </sc-for>
+  </div>
+  <sc-if value="{{ q.isFail }}" hint-placeholder-val="{{ false }}">
+  <div style="margin-top: 14px">
+    <label style="display: block; font-size: 12px; line-height: 15px; color: #9AA8B0">Describe the failure <span style="color: #E24B4A">*</span>
+    <textarea value="{{ q.comment }}" onChange="{{ q.onC }}" placeholder="What did you find?" style="display: block; resize: none; height: 54px; width: 100%; margin-top: 8px; border: none; border-bottom: 1px solid {{ q.line }}; outline: none; background: transparent; font: inherit; font-size: 13px; line-height: 18px; color: #343434; padding: 0; box-sizing: border-box"></textarea></label>
+  </div>
+  </sc-if>
+</div>
+</sc-for>
+</sc-if><div style="display: flex; gap: 10px; align-items: flex-start; margin: 22px 0 6px; padding: 10px 12px; background: #FFF6DC; border: 1px solid #F39C12; border-radius: 3px; font-size: 13px; line-height: 1.5; color: #5C4400">
+  <svg width="14.6" height="13" viewBox="0 0 576 512" aria-hidden="true" style="fill: #C77C02; flex-shrink: 0; margin-top: 3px"><path d="M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"></path></svg><span>Once submitted, answers can't be changed.</span>
+</div>
+    </div>
+    <footer style="flex-shrink: 0; padding: 2px; display: flex; flex-direction: column; gap: 5px">
+      <button onClick="{{ submit }}" aria-disabled="{{ submitDisabled }}" style="width: 100%; height: 32px; border: none; border-radius: 2px; background: {{ submitBg }}; color: #fff; font: inherit; font-size: 14px; font-weight: 500; letter-spacing: .4px; cursor: {{ submitCursor }}">SUBMIT</button>
+      <div data-hint="1" role="status" style="font-size: 12px; text-align: center; color: {{ hintColor }}; padding: 1px 0">{{ hintText }}</div>
+      <button onClick="{{ later }}" style="width: 100%; height: 32px; border: 1px solid #21B8BF; border-radius: 2px; background: #fff; color: #189DA3; font: inherit; font-size: 14px; font-weight: 500; letter-spacing: .4px; cursor: pointer; box-sizing: border-box">SAVE FOR LATER</button>
+    </footer>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+  <section style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+    <header style="height: 49px; flex-shrink: 0; background: #F4F4F4; display: flex; align-items: center; gap: 10px; padding: 0 16px">
+      <h2 style="margin: 0; font-size: 19px; font-weight: 400; color: #616161">Survey</h2>
+      <span style="flex: 1"></span>
+      <button onClick="{{ closePanel }}" aria-label="Close" title="Close" style="width: 32px; height: 32px; margin-right: -6px; background: none; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #616161"><svg width="11" height="16" viewBox="0 0 352 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg></button>
+    </header>
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center">
+      <div style="width: 80px; height: 80px; border-radius: 50%; background: #EEF8F8; border: 2px solid #21B8BF; display: flex; align-items: center; justify-content: center; color: #21B8BF; margin-bottom: 22px; box-sizing: border-box"><svg width="32.0" height="32" viewBox="0 0 512 512" aria-hidden="true" style="fill: currentColor; flex-shrink: 0;"><path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path></svg></div>
+      <h3 style="margin: 0 0 8px; font-size: 20px; font-weight: 500; color: #073B56">{{ doneName }} submitted</h3>
+      <p style="margin: 0; max-width: 300px; font-size: 13px; line-height: 1.6; color: #78909C">Your answers have been recorded for this visit and can no longer be changed.</p>
+      <span style="margin-top: 16px; font-size: 12px; color: #189DA3; background: #EEF8F8; border: 1px solid #CFEAEB; border-radius: 14px; padding: 4px 12px">{{ doneMeta }}</span>
+    </div>
+    <footer style="flex-shrink: 0; padding: 2px">
+      <sc-if value="{{ hasNext }}" hint-placeholder-val="{{ true }}">
+      <button onClick="{{ donePrimary }}" style="width: 100%; height: 32px; margin-bottom: 5px; border: none; border-radius: 2px; background: #21B8BF; color: #fff; font: inherit; font-size: 14px; font-weight: 500; letter-spacing: .4px; cursor: pointer">NEXT</button>
+      </sc-if>
+      <button onClick="{{ backToList }}" style="width: 100%; height: 32px; border: {{ backListBorder }}; border-radius: 2px; background: {{ backListBg }}; color: {{ backListColor }}; font: inherit; font-size: 14px; font-weight: 500; letter-spacing: .4px; cursor: pointer; box-sizing: border-box">BACK TO SURVEY LIST</button>
+    </footer>
+  </section>
+  </sc-if>
+</aside>
+
+<sc-if value="{{ sheetOn }}" hint-placeholder-val="{{ false }}">
+<div aria-hidden="true" style="position: absolute; inset: 0; background: rgba(0,0,0,.6); z-index: 20"></div>
+<section role="dialog" aria-label="{{ sheetTitle }}" style="position: absolute; left: 480px; top: 250px; width: 480px; background: #fff; z-index: 21; box-shadow: 0 8px 28px rgba(0,0,0,.4)">
+  <header style="height: 46px; background: #F4F4F4; display: flex; align-items: center; padding: 0 16px">
+    <h2 style="margin: 0; font-size: 19px; font-weight: 400; color: #616161">{{ sheetTitle }}</h2>
+  </header>
+  <div style="padding: 18px 20px 22px">
+    <sc-if value="{{ sheetHasKicker }}" hint-placeholder-val="{{ true }}">    <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: #1f6f73"><svg width="12.0" height="12" viewBox="0 0 512 512" aria-hidden="true" style="fill: #1f6f73; flex-shrink: 0;"><path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path></svg> {{ sheetKicker }}</div></sc-if>
+    <p style="margin: 10px 0 0; font-size: 14px; line-height: 1.55; color: #4A5A62">{{ sheetBody }}</p>
+    <div style="margin-top: 16px; border: 1px solid #E1E9ED; border-radius: 3px">
+      <sc-for list="{{ remainingRows }}" as="r" hint-placeholder-count="3">
+      <div style="padding: 10px 12px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #EEF1F2">
+        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: #189DA3; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1"></rect></svg>
+        <span style="flex: 1; min-width: 0; font-size: 14px; color: #343434">{{ r.name }}</span>
+        <span style="font-size: 12px; color: #78909C">{{ r.qText }}</span>
+      </div>
+      </sc-for>
+    </div>
+  </div>
+  <footer style="background: #F4F4F4; height: 52px; display: flex; align-items: center; justify-content: flex-end; gap: 6px; padding: 0 12px">
+    <button onClick="{{ sheetSecondary }}" style="height: 32px; padding: 0 18px; border: 1px solid #21B8BF; border-radius: 2px; background: #fff; color: #189DA3; font: inherit; font-size: 14px; font-weight: 500; letter-spacing: .3px; cursor: pointer">{{ sheetSecondaryLabel }}</button>
+    <button onClick="{{ sheetPrimary }}" style="height: 32px; padding: 0 18px; border: none; border-radius: 2px; background: #21B8BF; color: #fff; font: inherit; font-size: 14px; font-weight: 500; letter-spacing: .3px; cursor: pointer">{{ sheetPrimaryLabel }}</button>
+  </footer>
+</section>
+</sc-if>
+
+<div role="status" aria-live="polite" style="position: absolute; left: 50%; bottom: 28px; transform: {{ toastTransform }}; background: #343434; color: #fff; font-size: 14px; padding: 12px 24px; box-shadow: 0 2px 4px rgba(0,0,0,.24); white-space: nowrap; opacity: {{ toastOpacity }}; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 30">{{ toastMsg }}</div>
+</div>
+</template>
+<script type="text/x-dc" id="dc-logic">
+class Component extends DCLogic {
+  ans() {
+    var s = this.state || {};
+    return {
+      q1: s.q1 !== undefined ? s.q1 : 'Cheryl Peterson',
+      q2: s.q2 || null, q3: s.q3 || null, q3c: s.q3c || '', q4: s.q4 || '',
+      q5: s.q5 || '', q6: s.q6 || null, q7: s.q7 || ''
+    };
+  }
+  okQ5(v) { return v !== '' && +v >= 1 && +v <= 5; }
+  missing(a) {
+    var self = this;
+    return ['q1', 'q2', 'q3', 'q5', 'q6'].filter(function (k) {
+      var v = a[k];
+      if (k === 'q5') return !self.okQ5(v);
+      if (k === 'q3') return !v || (v === 'fail' && !a.q3c.trim());
+      return typeof v === 'string' ? !v.trim() : !v;
+    });
+  }
+  answered(a) {
+    var n = 0;
+    if (a.q1.trim()) n++;
+    if (a.q2) n++;
+    if (a.q3 === 'pass' || (a.q3 === 'fail' && a.q3c.trim())) n++;
+    if (a.q4) n++;
+    if (this.okQ5(a.q5)) n++;
+    if (a.q6) n++;
+    if (a.q7.trim()) n++;
+    return n;
+  }
+  answer(patch) { patch.pulse = false; patch.touched = true; this.setState(patch); }
+  panelNow() {
+    var s = this.state || {};
+    if (s.panelSet) return s.panel;
+    var map = { page: null, visit: 'visit', surveys: 'list', checklist: 'check', submitted: 'done', prompt: null, checkoutprompt: null, onhold: null };
+    var p = map[this.props.start];
+    return p === undefined ? null : p;
+  }
+  setPanel(p, extra) {
+    var patch = extra || {};
+    patch.panelSet = true;
+    patch.panel = p;
+    this.setState(patch);
+  }
+  toast(msg) {
+    var self = this;
+    this.setState({ toast: msg, toastOn: true });
+    clearTimeout(this._tt);
+    this._tt = setTimeout(function () { self.setState({ toastOn: false }); }, 2200);
+  }
+  submit() {
+    var self = this;
+    if (this.activeKey() !== 's1') { this.submitGeneric(this.activeKey()); return; }
+    var a = this.ans();
+    var miss = this.missing(a);
+    if (miss.length) {
+      this.setState({ pulse: true, flash: miss[0] });
+      var hint = document.querySelector('[data-hint]');
+      if (hint && hint.animate) {
+        hint.animate([
+          { transform: 'translateX(0)' }, { transform: 'translateX(-4px)' },
+          { transform: 'translateX(4px)' }, { transform: 'translateX(0)' }
+        ], { duration: 350 });
+      }
+      var el = document.querySelector('[data-q="' + miss[0].slice(1) + '"]');
+      if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      clearTimeout(this._ft);
+      this._ft = setTimeout(function () { self.setState({ flash: null }); }, 1200);
+      return;
+    }
+    this.setPanel('done', { doneCount: this.answered(a), clStatus: 'done', pulse: false });
+  }
+  surveys() {
+    return [
+      { key: 's1', name: 'Awning cleaning inspection', total: 7 },
+      { key: 's2', name: 'Site safety walk', total: 4, qs: ['Walkways are clear of debris', 'Wet floor signs are placed', 'Ladder is secured before use', 'Work area is left clean'] },
+      { key: 's3', name: 'Equipment condition check', total: 3, qs: ['Awning frame is intact', 'Fasteners are tight', 'No visible rust or corrosion'] }
+    ];
+  }
+  svStatus(k) {
+    if (k === 's1') return this.v('clStatus', 'due');
+    return this.v('st_' + k, 'due');
+  }
+  remaining() {
+    var self = this;
+    return this.surveys().filter(function (x) { return self.svStatus(x.key) !== 'done'; });
+  }
+  allDoneSv() { return this.remaining().length === 0; }
+  activeKey() { return this.v('active', 's1'); }
+  gAns(k) {
+    var s = this.state || {}, out = [];
+    var sv = this.surveys().filter(function (x) { return x.key === k; })[0];
+    for (var i = 0; i < sv.qs.length; i++) out.push({ v: s['g_' + k + '_' + i] || null, c: s['gc_' + k + '_' + i] || '' });
+    return out;
+  }
+  gMissing(k) {
+    var a = this.gAns(k), m = [];
+    a.forEach(function (x, i) { if (!x.v || (x.v === 'fail' && !x.c.trim())) m.push(i); });
+    return m;
+  }
+  openSurvey(k) {
+    var p = { sheet: null, active: k };
+    if (this.svStatus(k) === 'done') { this.setPanel('done', p); return; }
+    this.setPanel('check', p);
+  }
+  backToList() {
+    var k = this.activeKey(), patch = {};
+    if (this.svStatus(k) !== 'done') {
+      var touched = k === 's1' ? this.v('touched', false) : this.gAns(k).some(function (x) { return x.v; });
+      if (touched) { if (k === 's1') patch.clStatus = 'progress'; else patch['st_' + k] = 'progress'; }
+    }
+    this.setPanel('list', patch);
+  }
+  submitGeneric(k) {
+    var self = this;
+    var miss = this.gMissing(k);
+    if (miss.length) {
+      this.setState({ pulse: true, flash: 'g' + miss[0] });
+      var el = document.querySelector('[data-gq="' + miss[0] + '"]');
+      if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      clearTimeout(this._ft);
+      this._ft = setTimeout(function () { self.setState({ flash: null }); }, 1200);
+      return;
+    }
+    var p = { pulse: false }; p['st_' + k] = 'done';
+    this.setPanel('done', p);
+  }
+  sd() {
+    var st = this.props.start;
+    if (st === 'prompt') return { sheet: 'due', added: 1 };
+    if (st === 'checkoutprompt') return { sheet: 'checkout', coSet: true, checkedOut: true, added: 1 };
+    if (st === 'onhold') return { checkedOut: true, coSet: true, added: 1 };
+    if (st === 'submitted') return { clStatus: 'done' };
+    return {};
+  }
+  v(k, d) {
+    var s = this.state || {};
+    if (s[k] !== undefined) return s[k];
+    var x = this.sd();
+    return x[k] !== undefined ? x[k] : d;
+  }
+  saveVisit() {
+    var self = this;
+    var status = this.allDoneSv() ? 'done' : 'due';
+    var co = this.v('coSet', false);
+    var added = this.v('added', 0) + 1;
+    var patch = { added: added, highlight: added };
+    if (co) patch.checkedOut = true;
+    if (status !== 'done') patch.sheet = co ? 'checkout' : 'due';
+    this.setPanel(null, patch);
+    if (status === 'done') this.toast('Visit ' + (306 + added) + ' saved');
+    clearTimeout(this._ht);
+    this._ht = setTimeout(function () { self.setState({ highlight: 0 }); }, 1600);
+  }
+  backToWo() {
+    var patch = {};
+    if (this.v('clStatus', 'due') !== 'done' && this.v('touched', false)) patch.clStatus = 'progress';
+    this.setPanel(null, patch);
+  }
+  laterCl() {
+    var k = this.activeKey(), patch = {};
+    if (this.svStatus(k) !== 'done') { if (k === 's1') patch.clStatus = 'progress'; else patch['st_' + k] = 'progress'; }
+    this.setPanel('list', patch);
+    this.toast('Saved. You can finish it later.');
+  }
+  dfbSubmit() {
+    var s = this.state || {};
+    var r = s.dfbRating !== undefined ? s.dfbRating : null;
+    if (r === null) { this.setState({ dfbTried: true }); return; }
+    if (r <= 2 && !(s.dfbComment || '').trim()) {
+      this.setState({ dfbTried: true });
+      var el = document.querySelector('[data-dfbcomment="1"]');
+      if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    this.setState({ dfbSubmitted: true, dfbTried: false });
+    this.toast('Store feedback submitted');
+  }
+  restartDemo() {
+    clearTimeout(this._tt);
+    var s = this.state || {};
+    var p = {};
+    for (var k in s) p[k] = undefined;
+    this.setState(p);
+    this.toast('Demo restarted');
+  }
+  finish() {
+    this.setPanel(null, {});
+    this.toast('All surveys submitted');
+  }
+  componentWillUnmount() {
+    clearTimeout(this._tt); clearTimeout(this._ft); clearTimeout(this._ht);
+  }
+  renderVals() {
+    var self = this;
+    var s = this.state || {};
+    var a = this.ans();
+    var panel = this.panelNow();
+    var left = this.missing(a).length;
+    var n = this.answered(a);
+    var allDone = left === 0;
+    var sig = s.sig === undefined ? true : !!s.sig;
+    var ivr = !!s.ivr;
+    var pulse = !!s.pulse, flash = s.flash;
+    function fl(k) { return flash === k ? '0 0 0 2px rgba(226,75,74,.45)' : '0 0 0 0 rgba(226,75,74,0)'; }
+
+    var rows = [{ id: '306', cat: 'Awning | Cleaning', start: '9/7/2025, 9:34 AM EDT', checkin: '', checkout: '', time: '0 min', summary: 'this is a test text', pill: 'ETA MISSED', pillBg: '#CFA0F2', rowBg: '#fff' }];
+    for (var i = 1; i <= this.v('added', 0); i++) {
+      rows.push({ id: String(306 + i), cat: 'Awning | Cleaning', start: '9/7/2025, 9:34 AM EDT', checkin: '', checkout: '', time: '0 min', summary: '', pill: 'PENDING', pillBg: '#3CC4CB', rowBg: s.highlight === i ? '#E3F5F6' : '#fff' });
+    }
+
+    var clStatus = this.v('clStatus', 'due');
+    rows.forEach(function (r, i) { r.hasCl = i === rows.length - 1; r.noCl = !r.hasCl; });
+    var wfIdx = this.v('wfIdx', -1);
+    rows.forEach(function (r, i) {
+      r.wfOpen = wfIdx === i; r.wfExpanded = wfIdx === i ? 'true' : 'false';
+      r.toggleWf = function () { self.setState({ wfIdx: wfIdx === i ? -1 : i }); };
+      r.complete = function () {
+        if (!self.allDoneSv()) self.setState({ wfIdx: -1, sheet: 'complete' });
+        else { self.setState({ wfIdx: -1 }); self.toast('Work order completed (demo)'); }
+      };
+    });
+    var sheet = this.v('sheet', null);
+    var stMap = { due: ['Due', '#FFF1E0', '#8A4B00', 'START'], progress: ['In progress', '#E3F2FD', '#0D47A1', 'CONTINUE'], done: ['Done', '#E3F4F5', '#1f6f73', 'VIEW'] };
+    var stv = stMap[clStatus] || stMap.due;
+    var isCo = sheet === 'checkout';
+    var coSet = this.v('coSet', false);
+    var CLT = 'Awning cleaning inspection';
+    var svs = this.surveys(), rem = this.remaining(), remN = rem.length, svTotal = svs.length;
+    var actK = this.activeKey();
+    var actSv = svs.filter(function (x) { return x.key === actK; })[0];
+    var isGen = actK !== 's1';
+    var gA = isGen ? this.gAns(actK) : [];
+    var gMiss = isGen ? this.gMissing(actK) : [];
+    var gN = gA.filter(function (x) { return x.v === 'pass' || (x.v === 'fail' && x.c.trim()); }).length;
+    if (isGen) { n = gN; left = gMiss.length; allDone = left === 0; }
+    var actTotal = actSv.total;
+    var svMap = { due: ['To do', '#FFF1E0', '#8A4B00'], progress: ['In progress', '#E3F2FD', '#0D47A1'], done: ['Done', '#E3F4F5', '#1f6f73'] };
+    return {
+      isVisit: panel === 'visit',
+      isCheck: panel === 'check',
+      isList: panel === 'list',
+      isS1: !isGen, isGeneric: isGen,
+      actName: actSv.name,
+      openSurveys: function () { self.setPanel('list', { sheet: null }); },
+      backToList: function () { self.backToList(); },
+      todoText: remN ? (svTotal - remN) + ' of ' + svTotal + ' done' : 'All done',
+      todoTitle: remN ? remN + ' of ' + svTotal + ' surveys left for this visit' : 'All ' + svTotal + ' surveys done',
+      todoColor: remN ? '#189DA3' : '#2E7D32',
+      todoWeight: remN ? '500' : '400',
+      lastVisitId: String(306 + this.v('added', 0)),
+      listChip: (svTotal - remN) + ' of ' + svTotal + ' done',
+      listChipBg: remN ? '#EEF8F8' : '#21B8BF',
+      listChipColor: remN ? '#189DA3' : '#fff',
+      listChipBorder: remN ? '#CFEAEB' : '#21B8BF',
+      surveyRows: svs.map(function (x) {
+        var st = self.svStatus(x.key), m = svMap[st] || svMap.due, done = st === 'done';
+        return { name: x.name, meta: 'Required before checkout · ' + x.total + ' questions',
+          stText: m[0], stBg: m[1], stColor: m[2],
+          iconBg: done ? '#E3F4F5' : '#EEF8F8', iconColor: done ? '#1f6f73' : '#189DA3',
+          clipIcon: done ? 'none' : 'inline', doneIcon: done ? 'inline' : 'none',
+          open: function () { self.openSurvey(x.key); } };
+      }),
+      remainingRows: rem.map(function (x) { return { name: x.name, qText: x.total + ' questions' }; }),
+      gQs: isGen ? actSv.qs.map(function (lbl, i) {
+        var x = gA[i], k = actK;
+        var flashOn = s.flash === 'g' + i;
+        return { idx: String(i), num: String(i + 1), label: lbl, isFail: x.v === 'fail', comment: x.c,
+          fl: flashOn ? '0 0 0 2px rgba(226,75,74,.45)' : '0 0 0 0 rgba(226,75,74,0)',
+          line: flashOn && x.v === 'fail' && !x.c.trim() ? '#e24b4a' : '#cfcfcf',
+          onC: function (e) { var p = { pulse: false }; p['gc_' + k + '_' + i] = e.target.value; self.setState(p); },
+          opts: [['pass', 'PASS'], ['fail', 'FAIL']].map(function (o) {
+            var sel = x.v === o[0], isF = o[0] === 'fail';
+            return { label: o[1], pressed: sel ? 'true' : 'false', weight: sel ? '500' : '400',
+              bg: sel ? (isF ? '#C62828' : '#2E7D32') : '#fff', color: sel ? '#fff' : '#546e7a',
+              border: sel ? (isF ? '#C62828' : '#2E7D32') : '#cfcfcf',
+              pick: function () { var p = { pulse: false }; p['g_' + k + '_' + i] = o[0]; self.setState(p); } };
+          }) };
+      }) : [],
+      doneName: actSv.name,
+      donePrimaryLabel: remN ? 'NEXT SURVEY' : 'BACK TO WORK ORDER',
+      donePrimary: function () { if (remN) self.openSurvey(rem[0].key); else self.finish(); },
+      hasNext: remN > 0,
+      backListBg: remN ? '#fff' : '#21B8BF',
+      backListColor: remN ? '#189DA3' : '#fff',
+      backListBorder: remN ? '1px solid #21B8BF' : '1px solid #21B8BF',
+      isDone: panel === 'done',
+      panelX: panel ? 'translateX(0)' : 'translateX(100%)',
+      overlayOpacity: panel ? '1' : '0',
+      overlayEvents: panel ? 'auto' : 'none',
+      openVisit: function () { self.setPanel('visit'); },
+      saveVisit: function () { self.saveVisit(); },
+      backToWo: function () { self.backToWo(); },
+      coTap: function () { self.setState({ coSet: !coSet }); },
+      coAria: coSet ? 'Clear check out time' : 'Check out now',
+      coDate: coSet ? '09/07/2025' : 'Date',
+      coColor: coSet ? '#343434' : '#BDC6CB',
+      coTime: coSet ? '10:15 PM' : '',
+      coHint: coSet ? 'Checked out at 10:15 PM. Click to clear.' : 'Click to check out now.',
+      onHold: self.v('checkedOut', false) && remN > 0,
+      openChecklist: function () { self.setPanel('check', { sheet: null }); },
+      clTitle: CLT, clMeta: 'Required before checkout · 7 questions',
+      stText: stv[0], stBg: stv[1], stColor: stv[2], clAction: stv[3],
+      countText: remN ? remN + ' due' : 'All done',
+      countBg: remN ? '#B35F00' : '#1f6f73',
+      sheetOn: !!sheet,
+      clTipOpen: !!this.v('clTip', false),
+      toggleClTip: function () { self.setState({ clTip: !self.v('clTip', false) }); },
+      sheetHasKicker: sheet !== 'complete',
+      sheetKicker: isCo ? 'Visit saved with check out time' : 'Visit saved',
+      sheetTitle: sheet === 'complete' ? "Can't complete this work order yet" : (isCo ? (remN > 1 ? "Surveys aren't finished" : "A survey isn't finished") : remN + (remN > 1 ? ' surveys due' : ' survey due')),
+      sheetBody: sheet === 'complete' ? 'Finish the surveys below first. The work order can be completed once all its surveys are done.' : isCo ? "They're required before checkout. You can still check out, but this work order will be on hold until they're done." : 'Finish them now, or come back from the Surveys column in the Visits table before you check out.',
+      sheetPrimaryLabel: sheet === 'complete' ? 'FINISH SURVEYS' : (isCo ? 'FINISH NOW' : 'START SURVEYS'),
+      sheetSecondaryLabel: sheet === 'complete' ? 'CLOSE' : (isCo ? 'CHECK OUT ANYWAY' : 'LATER'),
+      sheetPrimary: function () { self.setPanel('list', { sheet: null }); },
+      sheetSecondary: function () { if (sheet === 'complete') { self.setState({ sheet: null }); return; } self.setState({ sheet: null }); self.toast(isCo ? 'Checked out. Work order is on hold.' : 'You can finish them from the Visits table.'); },
+      closePanel: function () { self.setPanel(null); },
+      logWork: function () { self.toast('Use the + in Visits to log a visit (demo)'); },
+
+      visitRows: rows,
+      visitCount: String(rows.length),
+
+      toggle_sig: function () { self.setState({ sig: !sig }); },
+      sigChecked: sig ? 'true' : 'false',
+      sigTrack: sig ? '#90A4AE' : '#D8DEE2',
+      sigLeft: sig ? '14px' : '-2px',
+      toggle_ivr: function () { self.setState({ ivr: !ivr }); },
+      ivrChecked: ivr ? 'true' : 'false',
+      ivrTrack: ivr ? '#90A4AE' : '#D8DEE2',
+      ivrLeft: ivr ? '14px' : '-2px',
+
+      chipText: n + ' / ' + actTotal,
+      chipBg: allDone ? '#21B8BF' : '#EEF8F8',
+      chipColor: allDone ? '#fff' : '#189DA3',
+      chipBorder: allDone ? '#21B8BF' : '#CFEAEB',
+
+      q1: a.q1,
+      onQ1: function (e) { self.answer({ q1: e.target.value }); },
+      hasPhoto: !!a.q2,
+      noPhoto: !a.q2,
+      photoName: a.q2 || 'photo.jpg',
+      onPhoto: function (e) {
+        var f = e.target.files && e.target.files[0];
+        if (f) self.answer({ q2: f.name });
+      },
+      rmPhoto: function () { self.answer({ q2: null }); },
+      q3opts: [['pass', 'PASS'], ['fail', 'FAIL']].map(function (p) {
+        var sel = a.q3 === p[0], isF = p[0] === 'fail';
+        return { label: p[1], bg: sel ? (isF ? '#C62828' : '#2E7D32') : '#fff', color: sel ? '#fff' : '#546e7a', weight: sel ? '500' : '400',
+          border: sel ? (isF ? '#C62828' : '#2E7D32') : '#cfcfcf', pressed: sel ? 'true' : 'false',
+          pIcon: isF ? 'none' : 'inline', fIcon: isF ? 'inline' : 'none',
+          pick: function () { self.answer({ q3: p[0] }); } };
+      }),
+      q3Fail: a.q3 === 'fail',
+      q3c: a.q3c,
+      onQ3c: function (e) { self.answer({ q3c: e.target.value }); },
+      q3cLine: (self.state && self.state.flash === 'q3' && !a.q3c.trim()) ? '#e24b4a' : '#cfcfcf',
+      q4: a.q4,
+      onQ4: function (e) { self.answer({ q4: e.target.value }); },
+      q5: a.q5,
+      onQ5: function (e) {
+        var v = e.target.value;
+        if (v !== '') v = String(Math.max(1, Math.min(5, parseInt(v, 10) || 1)));
+        self.answer({ q5: v });
+      },
+      q6opts: [['standard', 'Standard'], ['heavy', 'Heavy-duty'], ['eco', 'Eco-friendly']].map(function (p) {
+        var on = a.q6 === p[0];
+        return {
+          label: p[1], border: on ? '#21B8BF' : '#E1E9ED', bg: on ? '#EEF8F8' : '#fff',
+          color: on ? '#263238' : '#607D8B', weight: on ? '500' : '400',
+          dot: on ? '4px solid #21B8BF' : '1px solid #B0BEC5', pressed: on ? 'true' : 'false',
+          pick: function () { self.answer({ q6: p[0] }); }
+        };
+      }),
+      q7: a.q7,
+      onQ7: function (e) { self.answer({ q7: e.target.value }); },
+      fl1: fl('q1'), fl2: fl('q2'), fl3: fl('q3'), fl5: fl('q5'), fl6: fl('q6'),
+
+      submitBg: allDone ? '#21B8BF' : '#A6DFE2',
+      submitCursor: allDone ? 'pointer' : 'default',
+      submitDisabled: allDone ? 'false' : 'true',
+      hintText: allDone ? 'All required questions answered' : left + ' required question' + (left > 1 ? 's' : '') + ' remaining',
+      hintColor: pulse ? '#E24B4A' : '#9AA8B0',
+      submit: function () { self.submit(); },
+      later: function () { self.laterCl(); },
+
+      doneMeta: isGen ? actTotal + ' of ' + actTotal + ' questions answered' : (s.doneCount !== undefined ? s.doneCount : 7) + ' of 7 questions answered',
+      finish: function () { self.finish(); },
+      restartDemo: function () { self.restartDemo(); },
+      isOvView: (s.view || (self.props.start === 'storefeedback' ? 'sf' : 'ov')) === 'ov',
+      isSfView: (s.view || (self.props.start === 'storefeedback' ? 'sf' : 'ov')) === 'sf',
+      navOvGo: function () { self.setState({ view: 'ov' }); },
+      navSfGo: function () { self.setState({ view: 'sf' }); },
+      navOvCurrent: (s.view || (self.props.start === 'storefeedback' ? 'sf' : 'ov')) === 'ov' ? 'page' : 'false',
+      navSfCurrent: (s.view || (self.props.start === 'storefeedback' ? 'sf' : 'ov')) === 'sf' ? 'page' : 'false',
+      navOvBg: (s.view || (self.props.start === 'storefeedback' ? 'sf' : 'ov')) === 'ov' ? '#89C826' : 'transparent',
+      navSfBg: (s.view || (self.props.start === 'storefeedback' ? 'sf' : 'ov')) === 'sf' ? '#89C826' : 'transparent',
+      navOvColor: (s.view || (self.props.start === 'storefeedback' ? 'sf' : 'ov')) === 'ov' ? '#fff' : '#343434',
+      navSfColor: (s.view || (self.props.start === 'storefeedback' ? 'sf' : 'ov')) === 'sf' ? '#fff' : '#343434',
+      navOvWeight: (s.view || (self.props.start === 'storefeedback' ? 'sf' : 'ov')) === 'ov' ? '500' : '400',
+      navSfWeight: (s.view || (self.props.start === 'storefeedback' ? 'sf' : 'ov')) === 'sf' ? '500' : '400',
+      navOvShadow: (s.view || (self.props.start === 'storefeedback' ? 'sf' : 'ov')) === 'ov' ? '0 2px 5px rgba(0,0,0,.25)' : 'none',
+      navSfShadow: (s.view || (self.props.start === 'storefeedback' ? 'sf' : 'ov')) === 'sf' ? '0 2px 5px rgba(0,0,0,.25)' : 'none',
+      navOvZ: (s.view || (self.props.start === 'storefeedback' ? 'sf' : 'ov')) === 'ov' ? '1' : '0',
+      navSfZ: (s.view || (self.props.start === 'storefeedback' ? 'sf' : 'ov')) === 'sf' ? '1' : '0',
+      dfbStars: [1, 2, 3, 4, 5].map(function (n) {
+        var r = s.dfbRating !== undefined ? s.dfbRating : null;
+        var on = r !== null && n <= r;
+        return { n: String(n), label: n + (n === 1 ? ' star' : ' stars'),
+          fill: on ? '#E07B00' : 'none', stroke: on ? '#E07B00' : '#90A4AE', numColor: on ? '#263238' : '#9AA8B0',
+          pressed: r === n ? 'true' : 'false', cursor: s.dfbSubmitted ? 'default' : 'pointer',
+          pick: function () { if (!s.dfbSubmitted) self.setState({ dfbRating: n, dfbTried: false }); } };
+      }),
+      dfbRatingError: !!s.dfbTried && (s.dfbRating === undefined || s.dfbRating === null),
+      dfbIsLow: (s.dfbRating || 9) <= 2 && !s.dfbSubmitted,
+      dfbIsEdit: !s.dfbSubmitted,
+      dfbIsDone: !!s.dfbSubmitted,
+      dfbComment: s.dfbComment || '',
+      dfbOnComment: function (e) { self.setState({ dfbComment: e.target.value }); },
+      dfbCommentLine: s.dfbTried && (s.dfbRating || 9) <= 2 && !(s.dfbComment || '').trim() ? '#D32F2F' : '#DDE3E6',
+      dfbDoneComment: (s.dfbComment || '').trim() ? s.dfbComment : 'No comment',
+      dfbDoneCommentColor: (s.dfbComment || '').trim() ? '#343434' : '#9AA8B0',
+      dfbShowNote: (s.dfbRating || 9) <= 2 && !s.dfbSubmitted,
+      dfbNoteColor: s.dfbTried && !(s.dfbComment || '').trim() ? '#D32F2F' : '#78909C',
+      dfbSubmitBg: s.dfbRating ? '#21B8BF' : '#A6DFE2',
+      dfbSubmitCursor: s.dfbRating ? 'pointer' : 'default',
+      dfbSubmitDisabled: s.dfbRating ? 'false' : 'true',
+      dfbSubmit: function () { self.dfbSubmit(); },
+
+      toastMsg: s.toast || '',
+      toastOpacity: s.toastOn ? '1' : '0',
+      toastTransform: s.toastOn ? 'translateX(-50%) translateY(0)' : 'translateX(-50%) translateY(10px)'
+    };
+  }
+}
+
+</script>
+<script>
+(function () {
+  var h = React.createElement;
+  var ATTR = { 'class': 'className', 'for': 'htmlFor', tabindex: 'tabIndex', readonly: 'readOnly',
+    maxlength: 'maxLength', autocomplete: 'autoComplete', colspan: 'colSpan', rowspan: 'rowSpan' };
+  var EVT = { onclick: 'onClick', onchange: 'onChange', oninput: 'onInput', onkeydown: 'onKeyDown',
+    onkeyup: 'onKeyUp', onfocus: 'onFocus', onblur: 'onBlur', onmouseenter: 'onMouseEnter',
+    onmouseleave: 'onMouseLeave', onsubmit: 'onSubmit' };
+  var SKIP_WS = { svg: 1, select: 1, table: 1, thead: 1, tbody: 1, tr: 1 };
+
+  function lookup(expr, scope) {
+    expr = expr.trim();
+    if (expr === 'true') return true;
+    if (expr === 'false') return false;
+    if (expr === 'null') return null;
+    if (/^-?\d+(\.\d+)?$/.test(expr)) return +expr;
+    var m = expr.match(/^(['"])(.*)\1$/);
+    if (m) return m[2];
+    return expr.split('.').reduce(function (o, k) { return o == null ? undefined : o[k]; }, scope);
+  }
+  function resolve(str, scope) {
+    var whole = str.match(/^\s*\{\{([^}]*)\}\}\s*$/);
+    if (whole) return lookup(whole[1], scope);
+    if (str.indexOf('{{') < 0) return str;
+    return str.replace(/\{\{([^}]*)\}\}/g, function (_, e) { var v = lookup(e, scope); return v == null ? '' : String(v); });
+  }
+  function parseStyle(css) {
+    var out = {};
+    String(css).split(';').forEach(function (decl) {
+      var i = decl.indexOf(':');
+      if (i < 0) return;
+      var k = decl.slice(0, i).trim(), v = decl.slice(i + 1).trim();
+      if (!k) return;
+      if (k.indexOf('--') !== 0) k = k.replace(/-([a-z])/g, function (_, c) { return c.toUpperCase(); });
+      out[k] = v;
+    });
+    return out;
+  }
+  function build(nodes, scope, keyBase) {
+    var out = [];
+    Array.prototype.forEach.call(nodes, function (n, i) {
+      var key = keyBase + '.' + i;
+      if (n.nodeType === 3) {
+        var t = n.nodeValue;
+        if (!t.trim() && n.parentNode && SKIP_WS[n.parentNode.localName]) return;
+        out.push(resolve(t, scope));
+        return;
+      }
+      if (n.nodeType !== 1) return;
+      var tag = n.localName;
+      if (tag === 'sc-if') {
+        if (resolve(n.getAttribute('value') || '', scope)) out.push(h(React.Fragment, { key: key }, build(n.childNodes, scope, key)));
+        return;
+      }
+      if (tag === 'sc-for') {
+        var list = resolve(n.getAttribute('list') || '', scope) || [];
+        var as = n.getAttribute('as') || 'item';
+        list.forEach(function (item, j) {
+          var s = Object.create(scope); s[as] = item; s.$index = j;
+          out.push(h(React.Fragment, { key: key + ':' + j }, build(n.childNodes, s, key + ':' + j)));
+        });
+        return;
+      }
+      var props = { key: key }, hasChange = false;
+      Array.prototype.forEach.call(n.attributes, function (a) {
+        var name = a.name;
+        if (name.indexOf('hint-') === 0) return;
+        var v = resolve(a.value, scope);
+        if (EVT[name.toLowerCase()]) { props[EVT[name.toLowerCase()]] = v; if (/change|input/.test(name.toLowerCase())) hasChange = true; return; }
+        if (name === 'style') { props.style = parseStyle(v); return; }
+        props[ATTR[name] || name] = v;
+      });
+      if ((tag === 'input' || tag === 'textarea') && 'value' in props) {
+        if (props.value == null) props.value = '';
+        if (!hasChange) { props.defaultValue = props.value; delete props.value; }
+      }
+      if (tag === 'input' && props.type === 'file') delete props.value;
+      var kids = tag === 'textarea' ? [] : build(n.childNodes, scope, key);
+      out.push(h.apply(null, [tag, props].concat(kids)));
+    });
+    return out;
+  }
+
+  var tpl = document.getElementById('dc-template').content;
+  class DCLogic extends React.Component {
+    constructor(p) { super(p); this.state = {}; }
+    render() { return h(React.Fragment, null, build(tpl.childNodes, this.renderVals() || {}, 'r')); }
+  }
+  var Component = new Function('React', 'DCLogic', document.getElementById('dc-logic').textContent + '\nreturn Component;')(React, DCLogic);
+
+  var start = new URLSearchParams(location.search).get('start') || 'page';
+  ReactDOM.createRoot(document.getElementById('stage')).render(h(Component, { start: start }));
+
+  function fit() {
+    var s = Math.min(1, window.innerWidth / 1440, window.innerHeight / 900);
+    var st = document.getElementById('stage');
+    st.style.transform = 'scale(' + s + ')';
+    document.getElementById('frame').style.width = 1440 * s + 'px';
+    document.getElementById('frame').style.height = 900 * s + 'px';
+  }
+  window.addEventListener('resize', fit); fit();
+})();
+</script>
+</body>
+</html>
